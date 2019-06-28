@@ -1,0 +1,28 @@
+##############################################################################################
+#      Topic list
+##############################################################################################
+
+# --- Direct messages -------------- #
+
+imu            = sensor_msgs/Imu.msg
+u_rudder       = std_msgs/Float32.msg
+u_sail         = std_msgs/Float32.msg
+magnetic_field = sensor_msgs/MagneticField.msg
+wind_force     = std_msgs/Float32.msg
+wind_direction = std_msgs/Float32.msg
+gps            = ???
+
+# --- Filtered messages ------------- #
+
+euler_angles   = geometry_msgs/Vector3.msg       # from imu and magnetic_field
+pos            = geometry_msgs/Pose2D.msg        # from imu and GPS
+
+
+##############################################################################################
+#      Names
+##############################################################################################
+
+Callback function   : sub_TOPIC-NAME(data)
+Publisher name ROS  : SENDER_send_TOPIC-NAME
+Publisher name code : pub_send_TOPIC-NAME
+Publisher name msg  : TOPIC-NAME_msg

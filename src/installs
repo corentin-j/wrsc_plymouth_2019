@@ -1,0 +1,28 @@
+	// Install ros for arduino
+
+sudo apt-get install ros-melodic-rosserial-arduino
+// if you have any troubles with this command, try :
+// sudo -E apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key THE_KEY_IN_YOUR_ERROR_MESSAGE
+sudo apt-get install ros-melodic-rosserial
+
+cd home/Arduino/libraries
+rm -rf ros_lib
+rosrun rosserial_arduino make_libraries.py .
+
+	// Install Arduino
+
+// go to : https://www.arduino.cc/en/Main/Software
+// download your version, extract, move to arduino-1.6.x folder. Type the command ./install.sh
+
+// enable the port use :
+ls -l /dev/ttyACM*
+// you will get something like:
+// crw-rw---- 1 root dialout 188, 0 5 apr 23.01 ttyACM0
+// Now we just need to add our user to the group:
+sudo usermod -a -G dialout <username>
+
+// restart
+
+	// Install Git
+
+// https://openclassrooms.com/fr/courses/1233741-gerez-vos-codes-source-avec-git

@@ -1,0 +1,15 @@
+	// Run communicaion between Arduino and ROS
+
+// terminal 1
+roscore
+// terminal 2
+rosrun rosserial_arduino serial_node.py /dev/ttyACM0
+// display things in an other terminal
+rostopic list
+
+	// Gits
+
+https://github.com/Matthix7/plymouth_internship_2019
+https://github.com/AlexandreCourjaud/Stage2APlymouth
+
+tst 
