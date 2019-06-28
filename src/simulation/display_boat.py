@@ -74,13 +74,13 @@ def draw_sailboat(x,delta_s,delta_r,psi,awind):
     R=np.array([[cos(theta),-sin(theta),x[0]],[sin(theta),cos(theta),x[1]],[0,0,1]])
     Rs=np.array([[cos(delta_s),-sin(delta_s),3],[sin(delta_s),cos(delta_s),0],[0,0,1]])
     Rr=np.array([[cos(delta_r),-sin(delta_r),-1],[sin(delta_r),cos(delta_r),0],[0,0,1]])
-    draw_arrow(x[0]+5,x[1],psi,5*awind,'red')
     R1 = np.matmul(R, hull)
     R2 = np.matmul(np.matmul(R, Rs), sail)
     R3 = np.matmul(np.matmul(R, Rr), rudder)
     plot2D(R1,'black')
     plot2D(R2,'red',2)
     plot2D(R3,'red',2)
+    draw_arrow(x[0]+5,x[1],psi,5*awind,'blue')
 
 def plot2D(M,col='black',w=1):
     plt.plot(M[0, :], M[1, :], col, linewidth = w)
@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
     rospy.init_node('display_boat')
 
-    u_rudder,u_sail,wind_force,wind_direction = 0.7,-0.5,0,0
+    u_rudder,u_sail,wind_force,wind_direction = 0.7,-0.5,1,0
     x,y,theta = 0,0,0
 
     rospy.Subscriber("XXX_send_u_rudder", Float32, sub_u_rudder)
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     rospy.Subscriber("XXX_send_pos", Pose2D, sub_pos)
     rospy.Subscriber("imu_send_euler_angles", Vector3, sub_euler_angles)
 
-    ax=init_figure(-10,10,-10,10)
+    ax=init_figure(-20,20,-20,20)
 
     while not rospy.is_shutdown():
         X = array([[x,y,theta]]).T
