@@ -11,6 +11,7 @@ from geometry_msgs.msg import Vector3
 from sensor_msgs.msg import Imu
 from sensor_msgs.msg import MagneticField
 import time
+import os
 
 def rotation_matrix(pitch, roll):
 
@@ -79,7 +80,9 @@ def calibrate_imu(n = 200):# number of points to calibrate
 	rospy.loginfo(myResult[0])
 
 	# ---- Save in text file ------------------------------------------------- #
-	f = open('/home/corentin/wsp_wrc/src/WRSC_plymouth_JEGAT/src/sensors/imu_previous_calibration.txt','w')
+	THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
+	my_file = os.path.join(THIS_FOLDER, 'imu_previous_calibration.txt')
+	f = open(my_file,'w')
 	#f.write('offset_x:{}\noffset_y:{}\noffset_z:{}'.format(np.mean(mx), np.mean(my), np.mean(mz)))
 	f.write('offset_x:{}\noffset_y:{}\noffset_z:{}'.format(-ox,-oy,-oz))
 	f.close()
@@ -88,7 +91,9 @@ def calibrate_imu(n = 200):# number of points to calibrate
 	return offset
 
 def get_previous_imu():
-	f = open('/home/corentin/wsp_wrc/src/WRSC_plymouth_JEGAT/src/sensors/imu_previous_calibration.txt','r')
+	THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
+	my_file = os.path.join(THIS_FOLDER, 'imu_previous_calibration.txt')
+	f = open(my_file,'r')
 	doc = f.readlines()
 	f.close()
 	offset = np.zeros((9,1))
