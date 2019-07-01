@@ -103,8 +103,8 @@ if __name__ == '__main__':
     u_rudder,u_sail,wind_force,wind_direction = 0.7,-0.5,1,0
     x,y,theta = 0,0,0
 
-    rospy.Subscriber("XXX_send_u_rudder", Float32, sub_u_rudder)
-    rospy.Subscriber("XXX_send_u_sail", Float32, sub_u_sail)
+    rospy.Subscriber("control_send_u_rudder", Float32, sub_u_rudder)
+    rospy.Subscriber("control_send_u_sail", Float32, sub_u_sail)
     rospy.Subscriber("XXX_send_wind_force", Float32, sub_wind_force)
     rospy.Subscriber("filter_send_wind_direction", Float32, sub_wind_direction)
     rospy.Subscriber("XXX_send_pos", Pose2D, sub_pos)
