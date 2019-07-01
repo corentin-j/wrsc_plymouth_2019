@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
     rospy.init_node('display_boat')
 
-    u_rudder,u_sail,wind_force,wind_direction = 0.7,-0.5,1,0
+    u_rudder,u_sail,wind_force,wind_direction = 0.7,0.5,1,0
     x,y,theta = 0,0,0
 
     rospy.Subscriber("control_send_u_rudder", Float32, sub_u_rudder)
@@ -116,4 +116,4 @@ if __name__ == '__main__':
         X = array([[x,y,theta]]).T
 
         clear(ax)
-        draw_sailboat(X,u_sail*np.sign((wind_direction-theta)),u_rudder,wind_direction,wind_force)
+        draw_sailboat(X,u_sail*np.sign(-(wind_direction-theta)),u_rudder,wind_direction,wind_force)
