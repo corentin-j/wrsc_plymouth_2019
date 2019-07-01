@@ -99,6 +99,7 @@ if __name__ == '__main__':
 			wind_direction = np.arctan2(x[1,0],x[0,0])
 
 			wind_direction_msg.data = theta - wind_direction
+			rospy.loginfo("vent absolu : {}".format(theta - wind_direction))
 			pub_send_wind_direction.publish(wind_direction_msg)
 			#rospy.loginfo("Yaw : {}".format(yaw*180/np.pi))
 
