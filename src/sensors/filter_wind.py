@@ -25,7 +25,7 @@ def sub_wind_direction(data): # Float32
 
 def sub_euler_angles(data): # Vector3
     global theta
-    theta = data.x
+    theta = -data.x
     #rospy.loginfo("theta : %s",theta*180/np.pi)
 
 ##############################################################################################
