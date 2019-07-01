@@ -7,6 +7,7 @@ import time
 
 import rospy
 from std_msgs.msg import Float32
+from geometry_msgs.msg import Vector3
 
 from filter_lib import *
 ##############################################################################################
@@ -21,6 +22,11 @@ def sub_wind_direction(data): # Float32
     vect_temps = np.array([vect_temps[1],t,(t-vect_temps[1])])
     vect_wind_direction = np.array([vect_wind_direction[1],wind_direction,wind_direction-vect_wind_direction[1]])
     get = 1
+
+def sub_euler_angles(data): # Vector3
+    global theta
+    theta = data.x
+    #rospy.loginfo("theta : %s",theta*180/np.pi)
 
 ##############################################################################################
 #      Filtre
@@ -46,7 +52,6 @@ def H(x):
 	x1,x2 = x[0,0],x[1,0]
 	mat = np.array([[1,0,0],[0,1,0],[2*x1,2*x2,0]])
 	return mat
-	return mat
 
 ##############################################################################################
 #      Display
@@ -67,6 +72,7 @@ def clear(ax):
 vect_wind_direction = np.array([0,0,0])
 get = 0
 vect_temps = np.array([0,0,0]) # t_prec, t_curr, dt
+theta = 0
 
 if __name__ == '__main__':
 	# kalman : https://pdfs.semanticscholar.org/7274/0405dcf42373fd4ed6fbd0a6f2d8d2208590.pdf
@@ -91,7 +97,7 @@ if __name__ == '__main__':
 			[x,P] = EKF_yaw.EKF_step(+vect_wind_direction[2],z)
 			wind_direction = np.arctan2(x[1,0],x[0,0])
 
-			wind_direction_msg.data = wind_direction
+			wind_direction_msg.data = theta - wind_direction
 			pub_send_wind_direction.publish(wind_direction_msg)
 			#rospy.loginfo("Yaw : {}".format(yaw*180/np.pi))
 
