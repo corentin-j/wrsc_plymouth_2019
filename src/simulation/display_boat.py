@@ -15,22 +15,22 @@ from geometry_msgs.msg import Vector3
 
 def sub_u_rudder(data): # Float32
     global u_rudder
-    u_rudder = data
+    u_rudder = data.data
     #rospy.loginfo("u_rudder : %s", u_rudder)
 
 def sub_u_sail(data): # Float32
     global u_sail
-    u_sail = data
+    u_sail = data.data
     #rospy.loginfo("u_sail : %s", u_sail)
 
 def sub_wind_force(data): # Float32
     global wind_force
-    wind_force = data
+    wind_force = data.data
     #rospy.loginfo("wind_force : %s", wind_force)
 
 def sub_wind_direction(data): # Float32
     global wind_direction
-    wind_direction = data
+    wind_direction = data.data
     #rospy.loginfo("wind_direction : %s", wind_direction)
 
 def sub_pos(data): # Pose2D
@@ -43,7 +43,7 @@ def sub_pos(data): # Pose2D
 def sub_euler_angles(data): # Vector3
     global theta
     theta = -data.x
-    rospy.loginfo("theta : %s",theta*180/np.pi)
+    #rospy.loginfo("theta : %s",theta*180/np.pi)
 
 ##############################################################################################
 #      Display
@@ -106,9 +106,9 @@ if __name__ == '__main__':
     rospy.Subscriber("XXX_send_u_rudder", Float32, sub_u_rudder)
     rospy.Subscriber("XXX_send_u_sail", Float32, sub_u_sail)
     rospy.Subscriber("XXX_send_wind_force", Float32, sub_wind_force)
-    rospy.Subscriber("XXX_send_wind_direction", Float32, sub_wind_direction)
+    rospy.Subscriber("filter_send_wind_direction", Float32, sub_wind_direction)
     rospy.Subscriber("XXX_send_pos", Pose2D, sub_pos)
-    rospy.Subscriber("imu_send_euler_angles", Vector3, sub_euler_angles)
+    rospy.Subscriber("filter_send_euler_angles", Vector3, sub_euler_angles)
 
     ax=init_figure(-20,20,-20,20)
 
@@ -116,4 +116,4 @@ if __name__ == '__main__':
         X = array([[x,y,theta]]).T
 
         clear(ax)
-        draw_sailboat(X,u_sail,u_rudder,wind_direction,wind_force)
+        draw_sailboat(X,u_sail*np.sign(wind_direction-theta),u_rudder,wind_direction,wind_force)

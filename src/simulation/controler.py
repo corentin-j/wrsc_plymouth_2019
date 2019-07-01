@@ -9,6 +9,8 @@ from std_msgs.msg import String
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Point
 
+from filter_lib import *
+
 ##############################################################################################
 #      ROS
 ##############################################################################################
