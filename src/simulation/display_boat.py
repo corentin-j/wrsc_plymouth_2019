@@ -116,4 +116,4 @@ if __name__ == '__main__':
         X = array([[x,y,theta]]).T
 
         clear(ax)
-        draw_sailboat(X,u_sail*np.sign(-(wind_direction-theta)),u_rudder,wind_direction,wind_force)
+        draw_sailboat(X,u_sail*np.sign(-(wind_direction-theta)),-u_rudder,wind_direction,wind_force)
