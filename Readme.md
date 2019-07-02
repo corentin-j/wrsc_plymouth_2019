@@ -1,10 +1,17 @@
-# Autonomous sialboats
+# WRSC Plymouth 2019
 
-One Paragraph of project description goes here
+Work on autonomous sailboats as a 3-month internship 
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+This repository is a ROS package
+
+## Use this package
+1) Create a ROS workspace `mkdir -p workspaceRos/src/`, `cd workspaceRos`, `catkin_make`.
+2) In a terminal under `workspaceRos/src`, type `git clone https://github.com/corentin-j/wrsc_plymouth_2019`.
+3) Under `workspaceRos/`, type `catkin_make` then `. devel/setup.bash`.
+4) You now have the package installed in `workspaceRos/src/plymouth_internship_2019`. You will find the scripts relative to the different parts of the project in the folders of `plymouth_internship_2019/src`.
+
 
 ### Prerequisites
 
