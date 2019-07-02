@@ -237,6 +237,13 @@ if __name__ == '__main__':
 			pub_send_euler_angles.publish(euler_angles_msg)
 			rospy.loginfo("Yaw : {},Pitch : {}, Roll : {}".format(yaw*180/np.pi,pitch*180/np.pi,roll*180/np.pi))
 
+			#plt.xlim((-1,1))
+			#plt.ylim((-1,1))
+			#plt.plot([0,cos(a[0])],[0, sin(a[0])])
+			#plt.plot([0,cos(yaw)],[0, sin(yaw)])
+			#plt.pause(0.01)
+			#plt.cla()
+
 
 
 

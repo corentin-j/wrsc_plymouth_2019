@@ -10,6 +10,10 @@ from std_msgs.msg import Float32
 from geometry_msgs.msg import Vector3
 
 from filter_lib import *
+
+def sawtooth(x):
+    return (x+np.pi)%(2*np.pi)-np.pi   # or equivalently   2*arctan(tan(x/2))
+
 ##############################################################################################
 #      ROS
 ##############################################################################################
@@ -20,7 +24,7 @@ def sub_wind_direction(data): # Float32
     #rospy.loginfo("wind_direction : %s", wind_direction)
     t = time.time()
     vect_temps = np.array([vect_temps[1],t,(t-vect_temps[1])])
-    vect_wind_direction = np.array([vect_wind_direction[1],wind_direction,wind_direction-vect_wind_direction[1]])
+    vect_wind_direction = np.array([vect_wind_direction[1],wind_direction,sawtooth(wind_direction-vect_wind_direction[1])])
     get = 1
 
 def sub_euler_angles(data): # Vector3
@@ -88,6 +92,8 @@ if __name__ == '__main__':
 	R = 0.01*np.eye(3)
 	EKF_yaw   = Extended_kalman_filter(np.zeros((3,1)),P0,f,F,h,H,Q,R)
 	
+	l_temps,l_wind_raw,l_wind_EKF = [],[],[]
+
 	while not rospy.is_shutdown():
 
 		if get == 1: #each time we have a new value
@@ -95,13 +101,29 @@ if __name__ == '__main__':
 			# ----  Extended Kalman Filter ------------------------------------------------- #
 
 			z = np.array([[np.cos(vect_wind_direction[1])],[np.sin(vect_wind_direction[1])],[1]])
-			[x,P] = EKF_yaw.EKF_step(+vect_wind_direction[2],z)
+			[x,P] = EKF_yaw.EKF_step(vect_wind_direction[2],z)
 			wind_direction = np.arctan2(x[1,0],x[0,0])
 
 			wind_direction_msg.data = theta - wind_direction
 			rospy.loginfo("vent absolu : {}".format(theta - wind_direction))
 			pub_send_wind_direction.publish(wind_direction_msg)
 			#rospy.loginfo("Yaw : {}".format(yaw*180/np.pi))
+
+			l_temps.append(vect_temps[1])
+			l_wind_raw.append(vect_wind_direction[1]*180/np.pi)
+			l_wind_EKF.append(wind_direction*180/np.pi)
+
+			#plt.plot(l_temps,l_wind_raw,'b')
+			#plt.plot(l_temps,l_wind_EKF,'g')
+			#plt.xlim((vect_temps[1]-5,vect_temps[1]))
+			#plt.ylim((-50,50))
+			plt.xlim((-1,1))
+			plt.ylim((-1,1))
+			plt.plot([0,cos(wind_direction)],[0, sin(wind_direction)])
+			plt.plot([0,cos(vect_wind_direction[1])],[0, sin(vect_wind_direction[1])])
+
+			plt.pause(0.01)
+			plt.cla()
 
 
 
