@@ -242,7 +242,7 @@ if __name__ == '__main__':
 			#plt.plot([0,cos(a[0])],[0, sin(a[0])])
 			#plt.plot([0,cos(yaw)],[0, sin(yaw)])
 			#plt.pause(0.01)
-			#plt.cla()
+			#plt.cla() 
 
 
 
