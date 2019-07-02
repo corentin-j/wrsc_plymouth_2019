@@ -113,17 +113,12 @@ if __name__ == '__main__':
 			l_wind_raw.append(vect_wind_direction[1]*180/np.pi)
 			l_wind_EKF.append(wind_direction*180/np.pi)
 
-			#plt.plot(l_temps,l_wind_raw,'b')
-			#plt.plot(l_temps,l_wind_EKF,'g')
-			#plt.xlim((vect_temps[1]-5,vect_temps[1]))
-			#plt.ylim((-50,50))
-			plt.xlim((-1,1))
-			plt.ylim((-1,1))
-			plt.plot([0,cos(wind_direction)],[0, sin(wind_direction)])
-			plt.plot([0,cos(vect_wind_direction[1])],[0, sin(vect_wind_direction[1])])
-
-			plt.pause(0.01)
-			plt.cla()
+			#plt.xlim((-1,1))
+			#plt.ylim((-1,1))
+			#plt.plot([0,cos(wind_direction)],[0, sin(wind_direction)])
+			#plt.plot([0,cos(vect_wind_direction[1])],[0, sin(vect_wind_direction[1])])
+			#plt.pause(0.01)
+			#plt.cla()
 
 
 
