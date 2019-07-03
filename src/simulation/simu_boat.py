@@ -46,7 +46,7 @@ def f(x,u):
     dy=v*sin(theta) + p0*awind*sin(psi)
     dv=(fs*sin(delta_s)-fr*sin(delta_r)-p1*v**2)/p8
     dw=(fs*(p5-p6*cos(delta_s)) - p7*fr*cos(delta_r) - p2*w*v)/p9
-    xdot=np.array([ [dx],[dy],[w],[dv],[dw]])
+    xdot=np.array([[dx],[dy],[w],[dv],[dw]])
     return xdot,delta_s
 
 ##############################################################################################

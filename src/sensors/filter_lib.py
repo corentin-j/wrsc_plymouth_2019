@@ -13,7 +13,8 @@ class Kalman_filter():
 
 	def kalman_predict(self,u):
 		self.P = np.matmul(np.dot(self.F,self.P),self.F.T) + self.Q
-		self.x = np.matmul(self.F,self.x) + u    
+		self.x = np.matmul(self.F,self.x) + u
+		return(self.x,self.P)
 
 	def kalman_correc(self,y):
 		S = np.matmul(np.matmul(self.H,self.P),self.H.T) + self.R        
@@ -22,12 +23,20 @@ class Kalman_filter():
 		self.P = np.matmul((np.eye(len(self.x))-np.matmul(K,self.H)),self.P)
 		self.x = self.x + np.matmul(K,ytilde) 
 
-	def kalman_step(self,u,y, F=None):
+	def kalman_step(self,u,y, F=None, B=None):
 		if type(F) != type(None):
 			self.F = F
+		if type(B) != type(None):
+			self.B = B
 		self.kalman_predict(u)
 		self.kalman_correc(y)
 		return(self.x,self.P)
+
+	def kalman_set_B(self,B):
+		self.B = B
+
+	def kalman_set_F(self,F):
+		self.F = F
 
 class Extended_kalman_filter():
 

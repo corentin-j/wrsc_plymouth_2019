@@ -107,7 +107,7 @@ def get_previous_imu():
 	offset = np.zeros((9,1))
 	for i in range(len(doc)):
 		offset[i+6] = float(doc[i].split(':')[1])
-	rospy.loginfo(offset)
+	#rospy.loginfo(offset)
 	return offset
 
 ##############################################################################################
@@ -195,8 +195,8 @@ if __name__ == '__main__':
 	elif calibration == 'New':
 		offset = calibrate_imu()
 	else:
-
 		offset = np.zeros((9,1))
+	rospy.loginfo("\nCalibration done")
 
 	raw_imu = vect_imu + offset
 
@@ -212,35 +212,45 @@ if __name__ == '__main__':
 	EKF_pitch = Extended_kalman_filter(np.zeros((3,1)),P0,f,F,h,H,Q,R)
 	EKF_roll  = Extended_kalman_filter(np.zeros((3,1)),P0,f,F,h,H,Q,R)
 
+	alpha = 0.2
+	low_pass_imu = raw_imu.copy()
+	rospy.loginfo("\nStart main loop")
 	while not rospy.is_shutdown():
 		raw_imu = vect_imu + offset
+		if get == 1: #each time we have a new value
 
-		if get == 1:#not(np.all(a==vect_imu)): #each time we have a new value
+			#t0 = time.time()
 			get = 0
-			a = get_raw_angles(raw_imu)
+			low_pass_imu = alpha*raw_imu +(1-alpha)*low_pass_imu
+			a = get_raw_angles(low_pass_imu)
+
+			z = np.array([[np.cos(a[0])],[np.sin(a[0])],[1]])
+			[x,P] = EKF_yaw.EKF_step(-low_pass_imu[5,0],z)
+			s_yaw = np.arctan2(x[1,0],x[0,0])
 
 			z = np.array([[np.cos(a[0])],[np.sin(a[0])],[1]])
 			[x,P] = EKF_yaw.EKF_step(-raw_imu[5,0],z)
-			yaw = np.arctan2(x[1,0],x[0,0])-0.035
+			yaw = np.arctan2(x[1,0],x[0,0])
 
 			z = np.array([[np.cos(a[1])],[np.sin(a[1])],[1]])
-			[x,P] = EKF_pitch.EKF_step(raw_imu[3,0],z)
+			[x,P] = EKF_pitch.EKF_step(low_pass_imu[3,0],z)
 			pitch = np.arctan2(x[1,0],x[0,0])-0.018
 
 			z = np.array([[np.cos(a[2])],[np.sin(a[2])],[1]])
-			[x,P] = EKF_roll.EKF_step(raw_imu[4,0],z)
+			[x,P] = EKF_roll.EKF_step(low_pass_imu[4,0],z)
 			roll = np.arctan2(x[1,0],x[0,0])+0.008
 
 			euler_angles_msg.x = yaw
 			euler_angles_msg.y = pitch
 			euler_angles_msg.z = roll
 			pub_send_euler_angles.publish(euler_angles_msg)
-			rospy.loginfo("Yaw : {},Pitch : {}, Roll : {}".format(yaw*180/np.pi,pitch*180/np.pi,roll*180/np.pi))
-
+			#t1 = time.time()
+			#rospy.loginfo("Yaw : {},Pitch : {}, Roll : {}".format(yaw*180/np.pi,pitch*180/np.pi,roll*180/np.pi))
+			#rospy.loginfo(t1-t0)
 			#plt.xlim((-1,1))
 			#plt.ylim((-1,1))
-			#plt.plot([0,cos(a[0])],[0, sin(a[0])])
-			#plt.plot([0,cos(yaw)],[0, sin(yaw)])
+			#plt.plot([0,cos(a[0])],[0, sin(a[0])],color = 'black')
+			#plt.plot([0,cos(yaw)],[0, sin(yaw)],color = 'blue')
 			#plt.pause(0.01)
 			#plt.cla() 
 
