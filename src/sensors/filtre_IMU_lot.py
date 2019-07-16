@@ -257,6 +257,8 @@ if __name__ == '__main__':
 		#l_roll_EKF = []
 		#l_roll_kalman = []
 		#l_roll_raw = []
+
+		C_pitch = np.arctan2(raw_imu[1,0],raw_imu[0,0])
 		while not rospy.is_shutdown():
 			raw_imu = (vect_imu + offset) * 1
 			#display_mag(offset)
@@ -271,6 +273,7 @@ if __name__ == '__main__':
 				ax,ay,az = low_pass_imu[0,0],low_pass_imu[1,0],low_pass_imu[2,0]
 				gx,gy,gz = low_pass_imu[3,0],low_pass_imu[4,0],low_pass_imu[5,0]
 				mx,my,mz = low_pass_imu[6,0],low_pass_imu[7,0],low_pass_imu[8,0]
+				dt = vect_temps[2]
 				#lx[:n-1],ly[:n-1] = lx[1:], ly[1:]
 				#lx[n-1],ly[n-1] = mx,my
 				#rospy.loginfo([np.median(l),a[7,0]])
@@ -280,9 +283,10 @@ if __name__ == '__main__':
 
 				A_pitch = np.arctan2(ay,az)
 				A_roll = np.arctan2(-ax,np.sqrt(ay**2+az**2))
-				Mx = mx*cos(A_pitch)+mz*sin(A_pitch)
+				Mx = mx*cos(A_pitch)+mz*sin(A_pitch) #tilt compensation
 				My = mx*sin(A_roll)*sin(A_pitch)+my*cos(A_roll)-mz*sin(A_roll)*cos(A_pitch)
 				G_yaw = np.arctan2(-My,Mx)
+				
 
 				# ----  Kalman Filter ---------------------------------------------------------- #
 
@@ -290,8 +294,8 @@ if __name__ == '__main__':
 				A = np.array([[1,-dt*gz],[dt*gz,1]])
 				y = np.array([[np.cos(G_yaw)],[np.sin(G_yaw)]])
 				[xhat_yaw,Gx_yaw] = kf_yaw.kalman_step(0,y,A)
-				[xhat_pitch,Gx_pitch] = use_kalman(xhat_pitch,Gx_pitch,A_pitch,gx)
-				[xhat_roll,Gx_roll]   = use_kalman(xhat_roll ,Gx_roll ,A_roll ,gy)
+				#[xhat_pitch,Gx_pitch] = use_kalman(xhat_pitch,Gx_pitch,A_pitch,gx)
+				#[xhat_roll,Gx_roll]   = use_kalman(xhat_roll ,Gx_roll ,A_roll ,gy)
 				
 				#rospy.loginfo([kalman_to_deg(xhat_yaw),kalman_to_deg(xhat_pitch),kalman_to_deg(xhat_roll)])
 
@@ -319,7 +323,10 @@ if __name__ == '__main__':
 				[x_EKF_roll,P_EKF_roll] = EKF_update(z,x_p_roll,P_p_roll,h,H)
 				roll_EKF = np.arctan2(x_EKF_roll[1,0],x_EKF_roll[0,0])+0.008
 
-				rospy.loginfo(np.array([yaw_EKF,pitch_EKF,roll_EKF])*180/np.pi)
+				v = ax**2+ay**2+az**2
+				coeff = min(abs(v-1.05),0.15)/0.15
+				C_pitch = (C_pitch + dt*gx)#*coeff + A_pitch*(1-coeff)
+				rospy.loginfo([C_pitch,v,coeff])
 
 				euler_angles_msg.x = yaw_EKF
 				euler_angles_msg.y = pitch_EKF
@@ -327,9 +334,9 @@ if __name__ == '__main__':
 				pub_send_euler_angles.publish(euler_angles_msg)
 
 				l_temps.append(vect_temps[1])
-				l_yaw_raw.append(G_yaw*180/np.pi)
-				l_yaw_kalman.append(kalman_to_deg(xhat_yaw))
-				l_yaw_EKF.append(yaw_EKF*180/np.pi)
+				l_yaw_raw.append(A_pitch*180/np.pi)
+				l_yaw_kalman.append(C_pitch*180/np.pi)
+				l_yaw_EKF.append(pitch_EKF*180/np.pi)
 				#l_pitch_raw.append(A_pitch*180/np.pi)
 				#l_pitch_kalman.append(kalman_to_deg(xhat_pitch))
 				#l_pitch_EKF.append(pitch_EKF*180/np.pi)

@@ -22,7 +22,7 @@ pos            = geometry_msgs/Pose2D.msg        # from imu and GPS
 #      Names
 ##############################################################################################
 
-Callback function   : sub_TOPIC-NAME(data)
-Publisher name ROS  : SENDER_send_TOPIC-NAME
-Publisher name code : pub_send_TOPIC-NAME
-Publisher name msg  : TOPIC-NAME_msg
+Callback function     : sub_TOPIC-NAME(data)
+Publisher name topic  : SENDER_send_TOPIC-NAME
+Publisher name code   : pub_send_TOPIC-NAME
+Publisher name msg    : TOPIC-NAME_msg

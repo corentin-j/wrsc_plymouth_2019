@@ -83,3 +83,13 @@ class Median_filter():
 		self.l[self.n-1] = measure
 		return np.median(self.l)
 
+class Low_pass_filter():
+
+	def __init__(self,alpha, first_value):
+		self.alpha = alpha
+		self.previous = first_value
+
+	def low_pass_next(self,new):
+		new =  self.alpha*new + (1-self.alpha)*self.previous
+		self.previous = new
+		return new

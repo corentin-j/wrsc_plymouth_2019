@@ -9,6 +9,7 @@ from std_msgs.msg import String
 from std_msgs.msg import Float32
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Point
+from geometry_msgs.msg import Vector3
 
 
 ##############################################################################################
@@ -59,17 +60,17 @@ if __name__ == '__main__':
         # --- Boat variables --- #
 
         p0,p1,p2,p3,p4,p5,p6,p7,p8,p9 = 0.1,1,6000,1000,2000,1,1,2,300,10000
-        x = np.array([[10,40,0,1,0]]).T #x=(x,y,theta,v,w)
-        dt = 0.5#0.1
+        x = np.array([[0,30,-2*np.pi/3,1,0]]).T #x=(x,y,theta,v,w)
+        dt = 0.1
         pi = np.pi
-        awind,psi = 1,-0 #2,-2
+        awind,psi = 2,-2*np.pi/3 #2,-2
 
         # --- ROS -------------- #
 
-        pub_send_imu = rospy.Publisher('simu_send_imu', Imu, queue_size=10)
+        pub_send_theta = rospy.Publisher('simu_send_theta', Vector3, queue_size=10)
         pub_send_xy = rospy.Publisher('simu_send_xy', Point, queue_size=10)
         pub_send_wind = rospy.Publisher('simu_send_wind', Point, queue_size=10)
-        imu_msg = Imu()
+        theta_msg = Vector3()
         xy_msg = Point()
         wind_msg = Point()
         rospy.Subscriber("control_send_uq", Point, sub_uq)
@@ -77,24 +78,25 @@ if __name__ == '__main__':
         rate = rospy.Rate(10) # 10hz
 
         # --- Main ------------- #
-        u, q = np.array([[0.1],[0.1]]), 1
+        u, q = np.array([[0],[1.0]]), 1
         while not rospy.is_shutdown():
 
             xdot,delta_s=f(x,u)
             x = x + dt*xdot
+            rospy.loginfo(delta_s)
 
-            imu_msg.orientation.x = x[2,0] # heading
+            theta_msg.x = x[2,0] # heading
             xy_msg.x = x[0,0]              # x pos
             xy_msg.y = x[1,0]              # y pos
             xy_msg.z = delta_s
             wind_msg.x = awind             # wind force/speed
             wind_msg.y = psi               # wind direction
 
-            pub_send_imu.publish(imu_msg)
+            pub_send_theta.publish(theta_msg)
             pub_send_xy.publish(xy_msg)
             pub_send_wind.publish(wind_msg)
 
-            rospy.loginfo(xy_msg)
+            #rospy.loginfo(xy_msg)
             rate.sleep()
 
     except rospy.ROSInterruptException:

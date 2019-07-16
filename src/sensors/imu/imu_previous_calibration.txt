@@ -1,0 +1,7 @@
+norm_a:nan
+offset_gx:nan
+offset_gy:nan
+offset_gz:nan
+offset_mx:-0.0
+offset_my:-0.0
+offset_mz:-0.0

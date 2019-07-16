@@ -13,6 +13,7 @@ from sensor_msgs.msg import MagneticField
 import time
 import os
 
+from quaternion import Quaternion
 from filter_lib import *
 
 def get_raw_angles(raw_imu):
@@ -212,6 +213,8 @@ if __name__ == '__main__':
 	EKF_pitch = Extended_kalman_filter(np.zeros((3,1)),P0,f,F,h,H,Q,R)
 	EKF_roll  = Extended_kalman_filter(np.zeros((3,1)),P0,f,F,h,H,Q,R)
 
+	q = Quaternion(1,0,0,0)
+
 	alpha = 0.2
 	low_pass_imu = raw_imu.copy()
 	rospy.loginfo("\nStart main loop")
@@ -244,6 +247,7 @@ if __name__ == '__main__':
 			euler_angles_msg.y = pitch
 			euler_angles_msg.z = roll
 			pub_send_euler_angles.publish(euler_angles_msg)
+			#rospy.loginfo(low_pass_imu[0,0]**2+low_pass_imu[1,0]**2+low_pass_imu[2,0]**2)
 			#t1 = time.time()
 			#rospy.loginfo("Yaw : {},Pitch : {}, Roll : {}".format(yaw*180/np.pi,pitch*180/np.pi,roll*180/np.pi))
 			#rospy.loginfo(t1-t0)
@@ -253,6 +257,13 @@ if __name__ == '__main__':
 			#plt.plot([0,cos(yaw)],[0, sin(yaw)],color = 'blue')
 			#plt.pause(0.01)
 			#plt.cla() 
+
+			dt = vect_temps[2]
+			wx,wy,wz = raw_imu[3,0],raw_imu[4,0],raw_imu[5,0]
+			qdot = (Quaternion(0,raw_imu[3,0],raw_imu[4,0],raw_imu[5,0])*q)*0.5
+			q = q + qdot*dt
+			rospy.loginfo(q.to_euler123())
+
 
 
 
