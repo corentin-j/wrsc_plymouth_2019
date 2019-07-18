@@ -6,22 +6,12 @@ from numpy import cos,sin
 
 import rospy
 from std_msgs.msg import String
-from geometry_msgs.msg import Point
+from std_msgs.msg import Float32
 from geometry_msgs.msg import Vector3
+from geometry_msgs.msg import Point
 
 def sawtooth(x):
     return (x+np.pi)%(2*np.pi)-np.pi   # or equivalently   2*arctan(tan(x/2))
-
-
-##############################################################################################
-#      ROS
-##############################################################################################
-
-def sub_uq(data):
-    global u, q
-    #rospy.loginfo("U_deltar : %s, U_deltamax : %s, Q : %s",data.x, data.y, data.z)
-    u = np.array([[data.x],[data.y]])
-    q = data.z
 
 ##############################################################################################
 #      Controle
@@ -65,11 +55,13 @@ def sub_xy(data):
 	pos_y = data.y
 	delta_s = data.z
 
-def sub_wind(data):
-	global awind, psi
-	#rospy.loginfo("Awind : %s, Psi : %s",data.x, data.y)
-	awind = data.x
-	psi = data.y
+def sub_wind_direction(data):
+	global psi
+	psi = data.data
+
+def sub_wind_force(data):
+	global awind
+	awind = data.data
 
 def sub_theta(data):
 	global theta
@@ -86,28 +78,27 @@ theta = 0
 delta_s = 0
 
 if __name__ == '__main__':
-	try:
-		# --- Display ---------- #
 
-		a = array([[-75],[40]])   
-		b = array([[175],[-40]])
-		q = 1
-		rospy.init_node('controler')
-		rospy.Subscriber("simu_send_theta", Vector3, sub_theta)
-		rospy.Subscriber("simu_send_xy", Point, sub_xy)
-		rospy.Subscriber("simu_send_wind", Point, sub_wind)
-		pub_send_uq = rospy.Publisher('control_send_uq', Point, queue_size=10)
-		uq_msg = Point()
-		while not rospy.is_shutdown():
-			x = array([[pos_x,pos_y,theta]]).T
+	a = array([[-75],[40]])   
+	b = array([[175],[-40]])
+	q = 1
+	rospy.init_node('controler')
+	rospy.Subscriber("simu_send_theta", Vector3, sub_theta)
+	rospy.Subscriber("simu_send_xy", Point, sub_xy)
+	rospy.Subscriber("simu_send_wind_direction", Float32, sub_wind_direction)
+	rospy.Subscriber("simu_send_wind_force", Float32, sub_wind_force)
+	
+	pub_send_u_rudder = rospy.Publisher('control_send_u_rudder', Float32, queue_size=10)
+	pub_send_u_sail = rospy.Publisher('control_send_u_sail', Float32, queue_size=10)
+	u_rudder_msg = Float32()
+	u_sail_msg = Float32()
+	while not rospy.is_shutdown():
+		x = array([[pos_x,pos_y,theta]]).T
 
-			fut_x = x + 4*array([[np.cos(theta),np.sin(theta),0]]).T
-			u, q  = controle(fut_x,q)
+		fut_x = x + 4*array([[np.cos(theta),np.sin(theta),0]]).T
+		u, q  = controle(fut_x,q)
 
-			uq_msg.x = u[0,0]
-			uq_msg.y = u[1,0]
-			uq_msg.z = q
-			pub_send_uq.publish(uq_msg)
-			#rospy.loginfo(delta_s)
-	except rospy.ROSInterruptException:
-		pass
+		u_rudder_msg.data = u[0,0]
+		u_sail_msg.data = u[1,0]
+		pub_send_u_rudder.publish(u_rudder_msg)
+		pub_send_u_sail.publish(u_sail_msg)

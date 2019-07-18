@@ -19,14 +19,12 @@ int16_t ax,ay,az, gx,gy,gz, mx,my,mz;
 
 void setup() {
   // put your setup code here, to run once:
-  nh.getHardware()->setBaud(115200);
+  nh.getHardware()->setBaud(250000);
   nh.initNode();
-  Serial.begin(115200);
+  Serial.begin(250000);
   Wire.begin();
   Serial.println("Initializing I2C devices...");
   accelgyro.initialize();
-  accelgyro.setFullScaleGyroRange(0);
-  accelgyro.setFullScaleAccelRange(0);
   nh.advertise(pubImu);
   nh.advertise(pubMag);
   Serial.println("Testing device connections...");
@@ -40,6 +38,7 @@ void loop() {
   getAccelGyroCompass_Data();
   publishImu();
   //delay(10);
+  Serial.println(Axyz[0]);
 }
 
 void publishImu(){
@@ -62,13 +61,6 @@ void publishImu(){
   pubMag.publish(&magMsgs);  
 }
 
-
-
-/********************************************************************************************/
-/* Fonctions pour le fonctionnement de l'imu */
-
-
-
 void getAccelGyroCompass_Data(void){
   accelgyro.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);
   // rawAcc to accInG
@@ -79,7 +71,7 @@ void getAccelGyroCompass_Data(void){
   Gxyz[0] = (double) gx * 250 / 32768 * PI/180;
   Gxyz[1] = (double) gy * 250 / 32768 * PI/180;
   Gxyz[2] = (double) gz * 250 / 32768 * PI/180;
-  // rawMag to 
+  // rawMag to T
   Mxyz[0] = (double) mx * 1200 / 4096;
   Mxyz[1] = (double) my * 1200 / 4096;
   Mxyz[2] = (double) mz * 1200 / 4096;

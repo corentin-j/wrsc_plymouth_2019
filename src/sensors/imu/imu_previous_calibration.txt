@@ -1,7 +1,7 @@
-norm_a:nan
-offset_gx:nan
-offset_gy:nan
-offset_gz:nan
-offset_mx:-0.0
-offset_my:-0.0
-offset_mz:-0.0
+norm_a:1.02896293849
+offset_gx:-0.00800945627561
+offset_gy:0.0125701212586
+offset_gz:0.0287854432827
+offset_mx:-5.94893387393
+offset_my:3.05316820741
+offset_mz:12.6112572235

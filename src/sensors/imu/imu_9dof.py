@@ -23,7 +23,7 @@ class Imu_9dof():
 		self.offset = np.zeros((9,1))
 		self.vect_temps = np.zeros(3)
 		self.get = 0
-		self.yaw, self.pitch, self.roll = 0,0,0
+		self.yaw, self.pitch, self.roll = 1,1,1
 		self.pub_send_euler_angles = rospy.Publisher(pubName_euler_angles, Vector3, queue_size=10)
 		self.lp = None
 		self.vect_lp = np.zeros((9,1))
@@ -110,10 +110,11 @@ class Imu_9dof():
 				lgy.append(self.vect_agm[4,0])
 				lgz.append(self.vect_agm[5,0])
 				counter += 1
+		rospy.loginfo("\t\tOffsets : {},{},{}".format(-np.mean(lgx), -np.mean(lgy), -np.mean(lgz)))
 		rospy.loginfo("\tGyrometrers calibration ends")
 		return -np.mean(lgx), -np.mean(lgy), -np.mean(lgz)
 
-	def calibration_magnetometer(self,number_of_points=500):
+	def calibration_magnetometer(self,number_of_points=20):
 		"""
 		Return the offset of the magnetometer
 		"""
@@ -134,11 +135,12 @@ class Imu_9dof():
 				counter += 1
 				#rospy.loginfo(counter)
 		rospy.loginfo("\t\tStop turning")
-		rospy.loginfo("\tMagnetometer calibration ends")
 
 		params = [0.,0.,0.,0.]
 		myResult = optimize.leastsq(self.res_sphere, params, args=(mx,my,mz) )
 		ox, oy, oz, r = myResult[0]
+		rospy.loginfo("\t\tOffsets : {},{},{}".format(-ox,-oy,-oz))
+		rospy.loginfo("\tMagnetometer calibration ends")
 		return -ox,-oy,-oz
 
 	def res_sphere(self,p,x,y,z):
@@ -213,15 +215,15 @@ class Imu_9dof():
 		self.yaw = np.arctan2(x[1,0],x[0,0])
 
 		z = np.array([[np.cos(angles[1])],[np.sin(angles[1])],[1]])
-		[x,P] = self.ekf_pitch.EKF_step(self.vect_lp[3,0],z)
+		[x,P] = self.ekf_pitch.EKF_step(-self.vect_lp[3,0],z)
 		self.pitch = np.arctan2(x[1,0],x[0,0])-0.018
 
 		z = np.array([[np.cos(angles[2])],[np.sin(angles[2])],[1]])
-		[x,P] = self.ekf_roll.EKF_step(self.vect_lp[4,0],z)
+		[x,P] = self.ekf_roll.EKF_step(-self.vect_lp[4,0],z)
 		self.roll = np.arctan2(x[1,0],x[0,0])+0.008
 
-		#rospy.loginfo(np.array([self.yaw,self.pitch,self.roll])*180/np.pi)
-
+		rospy.loginfo(np.array([self.yaw,self.pitch,self.roll])*180/np.pi)
+		
 	###################################################################
 	#----- Euler angles ----------------------------------------------#
 	###################################################################
@@ -244,14 +246,13 @@ class Imu_9dof():
 			ax_norm = ax/np.sqrt(ax**2+ay**2+az**2)
 			ay_norm = ay/np.sqrt(ax**2+ay**2+az**2)
 		else:
-			ax_norm, ay_norm = 0.1 , 0.1
+			ax_norm, ay_norm = 0 , 0
 
 		A_pitch = np.arcsin(ax_norm)
 		A_roll = -np.arcsin(ay_norm/np.cos(A_pitch))
 		Mx = mx*cos(A_pitch)+mz*sin(A_pitch)
 		My = mx*sin(A_roll)*sin(A_pitch)+my*cos(A_roll)-mz*sin(A_roll)*cos(A_pitch)
 		G_yaw = -np.arctan2(My,Mx)
-		rospy.loginfo((G_yaw,A_pitch,A_roll))
 		return G_yaw,A_pitch,A_roll
 
 	def publish(self):

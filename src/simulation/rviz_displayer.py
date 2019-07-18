@@ -10,6 +10,7 @@ import time
 import numpy as np
 from geometry_msgs.msg import Vector3
 from geometry_msgs.msg import Point
+from std_msgs.msg import Float32
 
 class Marker_rviz():
 
@@ -73,11 +74,13 @@ def sub_xy(data):
 	y = data.y
 	delta_s = data.z
 
-def sub_wind(data):
-	global awind, psi
-	#rospy.loginfo("Awind : %s, Psi : %s",data.x, data.y)
-	awind = data.x
-	psi = data.y
+def sub_wind_direction(data):
+	global psi
+	psi = data.data
+
+def sub_wind_force(data):
+	global awind
+	awind = data.data
 
 def sub_uq(data):
     global dr
@@ -92,7 +95,8 @@ if __name__ == "__main__":
 	rospy.init_node('rviz_displayer')
 	rospy.Subscriber("simu_send_theta", Vector3, sub_euler_angles)
 	rospy.Subscriber("simu_send_xy", Point, sub_xy)
-	rospy.Subscriber("simu_send_wind", Point, sub_wind)
+	rospy.Subscriber("simu_send_wind_direction", Float32, sub_wind_direction)
+	rospy.Subscriber("simu_send_wind_force", Float32, sub_wind_force)
 	rospy.Subscriber("control_send_uq", Point, sub_uq)
 
 	marker_boat   = Marker_rviz("boat",(-0.5,-0.24,-0.2),(np.pi/2, 0, np.pi/2),(0.0002,0.0002,0.0002),10,(0.9,0.08,0))

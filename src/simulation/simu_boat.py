@@ -16,11 +16,13 @@ from geometry_msgs.msg import Vector3
 #      ROS
 ##############################################################################################
 
-def sub_uq(data):
-    global u, q
-    #rospy.loginfo("U_deltar : %s, U_deltamax : %s, Q : %s",data.x, data.y, data.z)
-    u = np.array([[data.x],[data.y]])
-    q = data.z
+def sub_u_rudder(data):
+    global u
+    u[0,0] = data.data
+
+def sub_u_sail(data):
+    global u
+    u[1,0] = data.data
 
 ##############################################################################################
 #      Euler integration
@@ -67,13 +69,16 @@ if __name__ == '__main__':
 
         # --- ROS -------------- #
 
-        pub_send_theta = rospy.Publisher('simu_send_theta', Vector3, queue_size=10)
-        pub_send_xy = rospy.Publisher('simu_send_xy', Point, queue_size=10)
-        pub_send_wind = rospy.Publisher('simu_send_wind', Point, queue_size=10)
+        pub_send_theta           = rospy.Publisher('simu_send_theta', Vector3, queue_size=10)
+        pub_send_xy              = rospy.Publisher('simu_send_xy', Point, queue_size=10)
+        pub_send_wind_direction  = rospy.Publisher('simu_send_wind_direction', Float32, queue_size=10)
+        pub_send_wind_force      = rospy.Publisher('simu_send_wind_force', Float32, queue_size=10)
         theta_msg = Vector3()
         xy_msg = Point()
-        wind_msg = Point()
-        rospy.Subscriber("control_send_uq", Point, sub_uq)
+        wind_direction_msg = Float32()
+        wind_force_msg = Float32()
+        rospy.Subscriber("control_send_u_rudder", Float32, sub_u_rudder)
+        rospy.Subscriber("control_send_u_sail", Float32, sub_u_sail)
         rospy.init_node('simu_boat')
         rate = rospy.Rate(10) # 10hz
 
@@ -86,17 +91,17 @@ if __name__ == '__main__':
             rospy.loginfo(delta_s)
 
             theta_msg.x = x[2,0] # heading
-            xy_msg.x = x[0,0]              # x pos
-            xy_msg.y = x[1,0]              # y pos
+            xy_msg.x = x[0,0]    # x pos
+            xy_msg.y = x[1,0]    # y pos
             xy_msg.z = delta_s
-            wind_msg.x = awind             # wind force/speed
-            wind_msg.y = psi               # wind direction
+            wind_direction_msg.data = psi   # wind direction
+            wind_force_msg.data = awind     # wind speed
 
             pub_send_theta.publish(theta_msg)
             pub_send_xy.publish(xy_msg)
-            pub_send_wind.publish(wind_msg)
-
-            #rospy.loginfo(xy_msg)
+            pub_send_wind_direction.publish(wind_direction_msg)
+            pub_send_wind_force.publish(wind_force_msg)
+            
             rate.sleep()
 
     except rospy.ROSInterruptException:
