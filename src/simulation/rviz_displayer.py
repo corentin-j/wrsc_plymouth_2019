@@ -1,8 +1,6 @@
 #!/usr/bin/env python2
 
 import rospy
-from std_msgs.msg import String
-from geometry_msgs.msg import PointStamped
 from visualization_msgs.msg import Marker
 from tf.transformations import quaternion_from_euler
 import tf
@@ -11,6 +9,10 @@ import numpy as np
 from geometry_msgs.msg import Vector3
 from geometry_msgs.msg import Point
 from std_msgs.msg import Float32
+
+##############################################################################################
+#      Rviz
+##############################################################################################
 
 class Marker_rviz():
 
@@ -61,6 +63,10 @@ class Marker_rviz():
 		self.marker.header.stamp = rospy.get_rostime()
 		self.pub_send_marker.publish(self.marker)
 
+##############################################################################################
+#      ROS
+##############################################################################################
+
 def sub_euler_angles(data):
 	global yaw,pitch,roll
 	yaw = data.x
@@ -87,6 +93,10 @@ def sub_uq(data):
     #rospy.loginfo("U_deltar : %s, U_deltamax : %s, Q : %s",data.x, data.y, data.z)
     dr = data.x
 
+##############################################################################################
+#      Main
+##############################################################################################
+
 if __name__ == "__main__":
 	yaw,pitch,roll = 0,0,0
 	x,y = 0,0
@@ -105,14 +115,14 @@ if __name__ == "__main__":
 	marker_wind   = Marker_rviz("wind",(0,0,0),(0, 0, 0),(awind+0.01,0.1,0.1),0)
 	marker_line   = Marker_rviz("line",(0,0,0),(0, 0, 0),(.2,0,0),4,(0,1,1))
 
-	a = 0
+	rate = rospy.Rate(10) # 10hz
 	while not rospy.is_shutdown():
 		marker_boat.publish()
 		marker_rudder.publish()
 		marker_sail.publish()
 		marker_wind.publish()
 		marker_line.publish()
-		time.sleep(0.1)
+		rate.sleep()
 
 		br_boat = tf.TransformBroadcaster()
 		br_boat.sendTransform((x, y, 0.0),quaternion_from_euler(roll,pitch,yaw),rospy.Time.now(),"boat","map")
@@ -122,6 +132,5 @@ if __name__ == "__main__":
 		br_rudder.sendTransform((-0.5,0,0),(quaternion_from_euler(0,0,np.pi+dr)),rospy.Time.now(),"rudder","boat")
 		br_sail = tf.TransformBroadcaster()
 		br_sail.sendTransform((0.1,0,0.3),(quaternion_from_euler(0,0,np.pi+delta_s)),rospy.Time.now(),"sail","boat")
-
 		br_line = tf.TransformBroadcaster()
 		br_line.sendTransform((0,0,0),(quaternion_from_euler(0,0,0)),rospy.Time.now(),"line","map")
