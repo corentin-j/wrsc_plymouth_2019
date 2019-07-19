@@ -60,7 +60,7 @@ if __name__ == '__main__':
 	u_rudder_msg = Float32()
 	u_sail_msg = Float32()
 
-	fmax = 20.0 # Hz
+	rate = rospy.Rate(10) # 10hz
 
 	while not rospy.is_shutdown():
 
@@ -72,4 +72,4 @@ if __name__ == '__main__':
 			publish[1] = 0
 			u_sail_msg.data = u_sail
 			pub_send_u_sail.publish(u_sail_msg)
-		rospy.sleep(1/fmax)
+		rate.sleep()

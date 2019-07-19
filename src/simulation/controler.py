@@ -87,11 +87,11 @@ if __name__ == '__main__':
 	rospy.Subscriber("simu_send_xy", Point, sub_xy)
 	rospy.Subscriber("simu_send_wind_direction", Float32, sub_wind_direction)
 	rospy.Subscriber("simu_send_wind_force", Float32, sub_wind_force)
-	
+
 	pub_send_u_rudder = rospy.Publisher('control_send_u_rudder', Float32, queue_size=10)
-	pub_send_u_sail = rospy.Publisher('control_send_u_sail', Float32, queue_size=10)
+	pub_send_u_sail   = rospy.Publisher('control_send_u_sail', Float32, queue_size=10)
 	u_rudder_msg = Float32()
-	u_sail_msg = Float32()
+	u_sail_msg   = Float32()
 	while not rospy.is_shutdown():
 		x = array([[pos_x,pos_y,theta]]).T
 
