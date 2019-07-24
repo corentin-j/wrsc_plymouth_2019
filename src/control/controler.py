@@ -128,7 +128,7 @@ if __name__ == '__main__':
 	u_rudder_msg = Float32()
 	u_sail_msg   = Float32()
 
-	while lat_lon_origin == [[],[]]:
+	while lat_lon_origin == [[],[]] and not rospy.is_shutdown():
 		rospy.sleep(0.5)
 		rospy.loginfo("[{}] Waiting GPS origin".format(node_name))
 	rospy.loginfo("[{}] Got GPS origin {}".format(node_name,lat_lon_origin))

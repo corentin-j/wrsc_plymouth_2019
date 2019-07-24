@@ -18,3 +18,4 @@ This repository is a ROS package. Here is a quick description of the folders.
 
 * https://github.com/AlexandreCourjaud/Stage2APlymouth
 * https://github.com/Matthix7/plymouth_internship_2019
+* https://github.com/AlexandreArgento/Plymouth-AutonomousSailboat-Catamaran

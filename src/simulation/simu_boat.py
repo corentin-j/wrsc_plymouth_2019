@@ -67,7 +67,7 @@ if __name__ == '__main__':
     # --- Boat variables --- #
 
     p0,p1,p2,p3,p4,p5,p6,p7,p8,p9 = 0.1,1,6000,1000,2000,1,1,2,300,10000
-    x = np.array([[80,-50,-2*np.pi/3,1,0]]).T #x=(x,y,theta,v,w)
+    x = np.array([[10,-10,-2*np.pi/3,1,0]]).T #x=(x,y,theta,v,w)
     dt = 0.1
     pi = np.pi
     awind,psi = 2,0.1 #2,-2
@@ -115,6 +115,7 @@ if __name__ == '__main__':
         utm_to_latlon = utm.to_latlon(lat_lon_origin[1][0]-x[1,0],lat_lon_origin[1][1]+x[0,0], lat_lon_origin[1][2],lat_lon_origin[1][3])
         gps_msg.latitude = utm_to_latlon[0]
         gps_msg.longitude = utm_to_latlon[1]
+        gps_msg.speed = x[3,0] #speed
 
         pub_send_theta.publish(theta_msg)
         pub_send_xy.publish(xy_msg)

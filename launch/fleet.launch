@@ -1,0 +1,8 @@
+<launch>
+
+	<node type="rviz" name="rviz" pkg="rviz" />
+	<node pkg="rostopic" type="rostopic" name="gps_origin" args="pub /launch_send_gps_origin geometry_msgs/Vector3 -- 50.695251 -4.236975 0" output="screen"/>
+	<node pkg="rostopic" type="rostopic" name="euler_angles" args="pub /xbee_send_euler_angles_1 geometry_msgs/Vector3 -- 9.3 -6.2 20.7" output="screen"/>
+	<node name="rviz_displayer_fleet" pkg="WRSC_plymouth_JEGAT" type="rviz_displayer_fleet.py" args="--test" respawn="true" output='screen' />
+	
+</launch>

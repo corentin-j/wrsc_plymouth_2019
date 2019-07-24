@@ -82,7 +82,7 @@ if __name__ == '__main__':
 	# kalman : https://pdfs.semanticscholar.org/7274/0405dcf42373fd4ed6fbd0a6f2d8d2208590.pdf
 	rospy.init_node('filtre_wind_direction')
 
-	rospy.Subscriber("filter_send_euler_angles", Vector3, sub_euler_angles)
+	rospy.Subscriber("ardu_send_euler_angles", Vector3, sub_euler_angles)
 	rospy.Subscriber("ardu_send_wind_direction", Float32, sub_wind_direction)
 	pub_send_wind_direction = rospy.Publisher('filter_send_wind_direction', Float32, queue_size=10)
 	wind_direction_msg = Float32()
