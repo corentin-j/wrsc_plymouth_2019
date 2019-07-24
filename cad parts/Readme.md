@@ -1,6 +1,7 @@
 # CAD Parts
 
-Parts have been designed or upload from a existant online model.\n
+Parts have been designed or upload from a existant online model.
+
 Software :Solidworks
 
 ## Real boat
