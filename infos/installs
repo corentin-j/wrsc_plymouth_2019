@@ -26,3 +26,5 @@ sudo usermod -a -G dialout <username>
 	// Install Git
 
 // https://openclassrooms.com/fr/courses/1233741-gerez-vos-codes-source-avec-git
+
+sudo apt-get install ros-melodic-gps-common

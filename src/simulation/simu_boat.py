@@ -3,12 +3,15 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy import cos,sin
+import utm
 
 import rospy
 from std_msgs.msg import Float32
 from geometry_msgs.msg import Point
 from geometry_msgs.msg import Vector3
+from gps_common.msg import GPSFix
 
+lat_lon_origin = [[],[]]
 
 ##############################################################################################
 #      ROS
@@ -21,6 +24,11 @@ def sub_u_rudder(data):
 def sub_u_sail(data):
     global u
     u[1,0] = data.data
+
+def sub_gps_origin(data):
+    global lat_lon_origin
+    lat_lon_origin[0] = [data.x, data.y]
+    lat_lon_origin[1] = utm.from_latlon(data.x, data.y)
 
 ##############################################################################################
 #      Euler integration
@@ -59,10 +67,10 @@ if __name__ == '__main__':
     # --- Boat variables --- #
 
     p0,p1,p2,p3,p4,p5,p6,p7,p8,p9 = 0.1,1,6000,1000,2000,1,1,2,300,10000
-    x = np.array([[0,30,-2*np.pi/3,1,0]]).T #x=(x,y,theta,v,w)
+    x = np.array([[80,-50,-2*np.pi/3,1,0]]).T #x=(x,y,theta,v,w)
     dt = 0.1
     pi = np.pi
-    awind,psi = 2,-2*np.pi/3 #2,-2
+    awind,psi = 2,0.1 #2,-2
 
     # --- ROS -------------- #
 
@@ -70,22 +78,32 @@ if __name__ == '__main__':
     pub_send_xy              = rospy.Publisher('simu_send_xy', Point, queue_size=10)
     pub_send_wind_direction  = rospy.Publisher('simu_send_wind_direction', Float32, queue_size=10)
     pub_send_wind_force      = rospy.Publisher('simu_send_wind_force', Float32, queue_size=10)
-    theta_msg = Vector3()
-    xy_msg = Point()
+    pub_send_gps             = rospy.Publisher('simu_send_gps', GPSFix, queue_size=10)
+    theta_msg          = Vector3()
+    xy_msg             = Point()
     wind_direction_msg = Float32()
-    wind_force_msg = Float32()
+    wind_force_msg     = Float32()
+    gps_msg            = GPSFix()
     rospy.Subscriber("control_send_u_rudder", Float32, sub_u_rudder)
     rospy.Subscriber("control_send_u_sail", Float32, sub_u_sail)
-    rospy.init_node('simu_boat')
-    rate = rospy.Rate(10) # 10hz
+    rospy.Subscriber("launch_send_gps_origin", Vector3, sub_gps_origin)
+    node_name = 'simu_boat'
+    rospy.init_node(node_name)
+    rate = rospy.Rate(1/dt) # 10hz
 
     # --- Main ------------- #
-    u, q = np.array([[0],[1.0]]), 1
+    u = np.array([[0],[1.0]])
+    while lat_lon_origin == [[],[]]:
+        rospy.sleep(0.5)
+        rospy.loginfo("[{}] Waiting GPS origin".format(node_name))
+    rospy.loginfo("[{}] Got GPS origin {}".format(node_name,lat_lon_origin))
+
     while not rospy.is_shutdown():
 
         xdot,delta_s=f(x,u)
         x = x + dt*xdot
-        rospy.loginfo(delta_s)
+        #rospy.loginfo("[{}] x : {}, y:{}".format(node_name,x[0,0],x[1,0]))
+        #rospy.loginfo("[{}] theta : {}".format(node_name,x[2,0]))
 
         theta_msg.x = x[2,0] # heading
         xy_msg.x = x[0,0]    # x pos
@@ -94,9 +112,14 @@ if __name__ == '__main__':
         wind_direction_msg.data = psi   # wind direction
         wind_force_msg.data = awind     # wind speed
 
+        utm_to_latlon = utm.to_latlon(lat_lon_origin[1][0]-x[1,0],lat_lon_origin[1][1]+x[0,0], lat_lon_origin[1][2],lat_lon_origin[1][3])
+        gps_msg.latitude = utm_to_latlon[0]
+        gps_msg.longitude = utm_to_latlon[1]
+
         pub_send_theta.publish(theta_msg)
         pub_send_xy.publish(xy_msg)
         pub_send_wind_direction.publish(wind_direction_msg)
         pub_send_wind_force.publish(wind_force_msg)
+        pub_send_gps.publish(gps_msg)
 
         rate.sleep()

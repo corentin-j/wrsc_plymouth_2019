@@ -1,0 +1,10 @@
+<launch>
+
+	<node type="rviz" name="rviz" pkg="rviz" />
+	<node pkg="rostopic" type="rostopic" name="gps_origin" args="pub /launch_send_gps_origin geometry_msgs/Vector3 -- 50.695251 -4.236975 0" output="screen"/>
+	<node name="simu_boat" pkg="WRSC_plymouth_JEGAT" type="simu_boat.py" args="--test" respawn="true" output='screen' />
+	<node name="controler" pkg="WRSC_plymouth_JEGAT" type="controler.py" args="--test" respawn="true" output='screen' />
+	<node name="rviz_displayer_line_following" pkg="WRSC_plymouth_JEGAT" type="rviz_displayer_line_following.py" args="--test" respawn="true" output='screen' />
+	<node name="lines_to_follow" pkg="WRSC_plymouth_JEGAT" type="lines_to_follow.py" args="--test" respawn="true" output='screen' />
+	
+</launch>
