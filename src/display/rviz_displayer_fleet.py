@@ -104,17 +104,19 @@ class Boat():
 		self.marker_rudder = Marker_rviz("rudder_"+str(self.num),(0.15,0,-0.2),(np.pi/2, 0, -np.pi/2),(0.0004,0.0004,0.0004),10)
 		self.marker_sail   = Marker_rviz("sail_"+str(self.num),(0.55,0,0),(np.pi/2, 0, -np.pi/2),(0.0002,0.0002,0.0002),10,(0.8,0.64,0.64))
 
+	def transform(self):
+		self.br_boat = tf.TransformBroadcaster()
+		self.br_rudder = tf.TransformBroadcaster()
+		self.br_sail = tf.TransformBroadcaster()
+
 	def publish_markers(self):
 		self.marker_boat.publish()
 		self.marker_rudder.publish()
 		self.marker_sail.publish()
 
 	def publish_transform(self):
-		self.br_boat = tf.TransformBroadcaster()
 		self.br_boat.sendTransform((self.x, self.y, 0.0),quaternion_from_euler(self.roll,self.pitch,self.yaw),rospy.Time.now(),"boat_"+str(self.num),"map")
-		self.br_rudder = tf.TransformBroadcaster()
 		self.br_rudder.sendTransform((-0.5,0,0),(quaternion_from_euler(0,0,np.pi)),rospy.Time.now(),"rudder_"+str(self.num),"boat_"+str(self.num))
-		self.br_sail = tf.TransformBroadcaster()
 		self.br_sail.sendTransform((0.1,0,0.3),(quaternion_from_euler(0,0,np.pi)),rospy.Time.now(),"sail_"+str(self.num),"boat_"+str(self.num))
 
 
@@ -135,17 +137,17 @@ if __name__ == "__main__":
 	rospy.init_node(node_name)
 
 	rospy.Subscriber("launch_send_gps_origin", Vector3, sub_gps_origin)
-	while lat_lon_origin == [[],[]]:
+	while lat_lon_origin == [[],[]] and not rospy.is_shutdown():
 		rospy.sleep(0.5)
 		rospy.loginfo("[{}] Waiting GPS origin".format(node_name))
 	rospy.loginfo("[{}] Got GPS origin {}".format(node_name,lat_lon_origin))
 
 	l_boats = []
 	for i in range(1,nb_boats+1):
-		rospy.loginfo(i)
 		l_boats.append(Boat(i,lat_lon_origin))
 	for i in l_boats:
 		i.markers()
+		i.transform()
 
 	rate = rospy.Rate(10) # 10hz
 	while not rospy.is_shutdown():
