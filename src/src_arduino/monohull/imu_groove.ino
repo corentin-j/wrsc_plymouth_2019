@@ -1,20 +1,12 @@
-#include "I2Cdev.h"
 #include "MPU9250.h"
-#include <ros.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/MagneticField.h>
-#include <Wire.h>
 
 /*****************************************************************************
- * Global
+ * Variables
  *****************************************************************************/
-ros::NodeHandle nh;
+
 MPU9250 accelgyro;
-I2Cdev   I2C_M;
-
-/*****************************************************************************
- * IMU
- *****************************************************************************/
 sensor_msgs::Imu imuMsgs;
 ros::Publisher pubImu("ardu_send_imu",&imuMsgs);
 sensor_msgs::MagneticField magMsgs;
@@ -23,14 +15,11 @@ ros::Publisher pubMag("ardu_send_mag",&magMsgs);
 float Axyz[3],Gxyz[3],Mxyz[3];
 int16_t ax,ay,az, gx,gy,gz, mx,my,mz;
 
-
-void setup() {
-  // put your setup code here, to run once:
-  nh.getHardware()->setBaud(250000);
-  nh.initNode();
-  Serial.begin(250000);
-  Wire.begin();
-  Serial.println("Initializing I2C devices...");
+/*****************************************************************************
+ * Program
+ *****************************************************************************/
+ 
+void imu_groove_setup() {
   accelgyro.initialize();
   nh.advertise(pubImu);
   nh.advertise(pubMag);
@@ -39,15 +28,12 @@ void setup() {
   delay(1000);
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
-  nh.spinOnce();
-  getAccelGyroCompass_Data();
-  publishImu();
-  //delay(10);
+void imu_groove_update() {
+  imu_groove_getdata();
+  imu_groove_publish();
 }
 
-void publishImu(){
+void imu_groove_publish(){
   long temps = millis();
   imuMsgs.header.stamp.sec = temps/1000;
   imuMsgs.header.stamp.nsec = temps;
@@ -67,7 +53,7 @@ void publishImu(){
   pubMag.publish(&magMsgs);  
 }
 
-void getAccelGyroCompass_Data(void){
+void imu_groove_getdata(void){
   accelgyro.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);
   // rawAcc to accInG
   Axyz[0] = (double) ax / 16384;

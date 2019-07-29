@@ -1,0 +1,22 @@
+## Scale 1 : True scale
+
+# Marker : position,angles,scale
+
+#boat
+(-0.5,-0.24,-0.2),(np.pi/2, 0, np.pi/2),(0.0002,0.0002,0.0002)
+#rudder
+(0.15,0,-0.2),(np.pi/2, 0, -np.pi/2),(0.0004,0.0004,0.0004)
+#sail
+(0.55,0,0),(np.pi/2, 0, -np.pi/2),(0.0002,0.0002,0.0002)
+#text
+(0,0,0),(0, 0, 0),(1,1,0.5)
+
+# Transform
+#boat
+(self.x, self.y, 0.0),quaternion_from_euler(self.roll,self.pitch,self.yaw)
+#rudder
+(-0.5,0,0),(quaternion_from_euler(0,0,np.pi)
+#sail
+(0.1,0,0.3),(quaternion_from_euler(0,0,np.pi)
+#text
+(0,0,1),(quaternion_from_euler(0,0,0)

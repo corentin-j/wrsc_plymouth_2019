@@ -69,6 +69,9 @@ class Marker_rviz():
 		p2.x,p2.y = set_p2 # 175,-40
 		self.marker.points.append(p2)
 
+	def set_text(self, text):
+		self.marker.text = text
+
 ##############################################################################################
 #      Boat
 ##############################################################################################
@@ -85,6 +88,7 @@ class Boat():
 		self.roll = 0
 		self.x = 0
 		self.y = 0
+		self.scale = 1
 
 	def sub_euler_angles(self,data):
 		self.yaw = data.x
@@ -99,25 +103,31 @@ class Boat():
 	def print_euler_angles(self):
 		return "Boat {} : Yaw={}, Pitch={}, Roll={}".format(self.num,self.yaw,self.pitch,self.roll)
 
-	def markers(self):
-		self.marker_boat   = Marker_rviz("boat_"+str(self.num),(-0.5,-0.24,-0.2),(np.pi/2, 0, np.pi/2),(0.0002,0.0002,0.0002),10,(0.9,0.08,0))
-		self.marker_rudder = Marker_rviz("rudder_"+str(self.num),(0.15,0,-0.2),(np.pi/2, 0, -np.pi/2),(0.0004,0.0004,0.0004),10)
-		self.marker_sail   = Marker_rviz("sail_"+str(self.num),(0.55,0,0),(np.pi/2, 0, -np.pi/2),(0.0002,0.0002,0.0002),10,(0.8,0.64,0.64))
+	def markers(self,scale = 1):
+		self.scale = scale
+		self.marker_boat   = Marker_rviz("boat_"+str(self.num),(-0.5*scale,-0.24*scale,-0.2*scale),(np.pi/2, 0, np.pi/2),(0.0002*scale,0.0002*scale,0.0002*scale),10,(0.9,0.08,0))
+		self.marker_rudder = Marker_rviz("rudder_"+str(self.num),(0.15*scale,0,-0.2*scale),(np.pi/2, 0, -np.pi/2),(0.0004*scale,0.0004*scale,0.0004*scale),10)
+		self.marker_sail   = Marker_rviz("sail_"+str(self.num),(0.55*scale,0,0),(np.pi/2, 0, -np.pi/2),(0.0002*scale,0.0002*scale,0.0002*scale),10,(0.8,0.64,0.64))
+		self.marker_text   = Marker_rviz("text_"+str(self.num),(0,0,0),(0, 0, 0),(1,1,0.5*scale),9,(1,1,1))
+		self.marker_text.set_text("boat_"+str(self.num))
 
 	def transform(self):
-		self.br_boat = tf.TransformBroadcaster()
+		self.br_boat   = tf.TransformBroadcaster()
 		self.br_rudder = tf.TransformBroadcaster()
-		self.br_sail = tf.TransformBroadcaster()
+		self.br_sail   = tf.TransformBroadcaster()
+		self.br_text   = tf.TransformBroadcaster()
 
 	def publish_markers(self):
 		self.marker_boat.publish()
 		self.marker_rudder.publish()
 		self.marker_sail.publish()
+		self.marker_text.publish()
 
 	def publish_transform(self):
 		self.br_boat.sendTransform((self.x, self.y, 0.0),quaternion_from_euler(self.roll,self.pitch,self.yaw),rospy.Time.now(),"boat_"+str(self.num),"map")
-		self.br_rudder.sendTransform((-0.5,0,0),(quaternion_from_euler(0,0,np.pi)),rospy.Time.now(),"rudder_"+str(self.num),"boat_"+str(self.num))
-		self.br_sail.sendTransform((0.1,0,0.3),(quaternion_from_euler(0,0,np.pi)),rospy.Time.now(),"sail_"+str(self.num),"boat_"+str(self.num))
+		self.br_rudder.sendTransform((-0.5*self.scale,0,0),(quaternion_from_euler(0,0,np.pi)),rospy.Time.now(),"rudder_"+str(self.num),"boat_"+str(self.num))
+		self.br_sail.sendTransform((0.1*self.scale,0,0.3*self.scale),(quaternion_from_euler(0,0,np.pi)),rospy.Time.now(),"sail_"+str(self.num),"boat_"+str(self.num))
+		self.br_text.sendTransform((0,0,1*self.scale),(quaternion_from_euler(0,0,0)),rospy.Time.now(),"text_"+str(self.num),"boat_"+str(self.num))
 
 
 
@@ -132,7 +142,7 @@ def sub_gps_origin(data):
 
 if __name__ == "__main__":
 	lat_lon_origin = [[],[]]
-	nb_boats = 3
+	nb_boats = 1
 	node_name = "rviz_displayer_fleet"
 	rospy.init_node(node_name)
 
@@ -146,7 +156,7 @@ if __name__ == "__main__":
 	for i in range(1,nb_boats+1):
 		l_boats.append(Boat(i,lat_lon_origin))
 	for i in l_boats:
-		i.markers()
+		i.markers(3)
 		i.transform()
 
 	rate = rospy.Rate(10) # 10hz

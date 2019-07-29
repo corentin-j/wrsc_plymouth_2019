@@ -91,7 +91,7 @@ class Imu_9dof():
 		rospy.loginfo("\tAccelerometers calibration ends")
 		return np.mean(l)
 
-	def calibration_gyro(self,number_of_points=40):
+	def calibration_gyro(self,number_of_points=200):
 		"""
 		Return the offset of the gryroscope
 		"""
@@ -114,7 +114,7 @@ class Imu_9dof():
 		rospy.loginfo("\tGyrometrers calibration ends")
 		return -np.mean(lgx), -np.mean(lgy), -np.mean(lgz)
 
-	def calibration_magnetometer(self,number_of_points=20):
+	def calibration_magnetometer(self,number_of_sec=10):
 		"""
 		Return the offset of the magnetometer
 		"""
@@ -124,20 +124,18 @@ class Imu_9dof():
 		rospy.loginfo("\t\tReady ?")
 		rospy.sleep(1)
 		rospy.loginfo("\t\tGetting data, keep turning")
-		mx,my,mz = np.zeros(number_of_points), np.zeros(number_of_points), np.zeros(number_of_points)
-		counter = 0
-		while not rospy.is_shutdown() and counter < number_of_points:
+		mx,my,mz = [],[],[]
+		t0 = rospy.get_time()
+		while not rospy.is_shutdown() and (rospy.get_time() - t0) < number_of_sec:
 			if self.get == 1: #each time we have a new value
 				self.get = 0
-				mx[counter] = self.vect_agm[6,0]
-				my[counter] = self.vect_agm[7,0]
-				mz[counter] = self.vect_agm[8,0]
-				counter += 1
-				#rospy.loginfo(counter)
+				mx.append(self.vect_agm[6,0])
+				my.append(self.vect_agm[7,0])
+				mz.append(self.vect_agm[8,0])
 		rospy.loginfo("\t\tStop turning")
 
 		params = [0.,0.,0.,0.]
-		myResult = optimize.leastsq(self.res_sphere, params, args=(mx,my,mz) )
+		myResult = optimize.leastsq(self.res_sphere, params, args=(np.array(mx),np.array(my),np.array(mz)) )
 		ox, oy, oz, r = myResult[0]
 		rospy.loginfo("\t\tOffsets : {},{},{}".format(-ox,-oy,-oz))
 		rospy.loginfo("\tMagnetometer calibration ends")
@@ -211,7 +209,7 @@ class Imu_9dof():
 		dt = self.vect_temps[2]
 
 		z = np.array([[np.cos(angles[0])],[np.sin(angles[0])],[1]])
-		[x,P] = self.ekf_yaw.EKF_step(-self.vect_lp[5,0],z)
+		[x,P] = self.ekf_yaw.EKF_step(self.vect_lp[5,0],z)
 		self.yaw = np.arctan2(x[1,0],x[0,0])
 
 		z = np.array([[np.cos(angles[1])],[np.sin(angles[1])],[1]])
@@ -252,7 +250,10 @@ class Imu_9dof():
 		A_roll = -np.arcsin(ay_norm/np.cos(A_pitch))
 		Mx = mx*cos(A_pitch)+mz*sin(A_pitch)
 		My = mx*sin(A_roll)*sin(A_pitch)+my*cos(A_roll)-mz*sin(A_roll)*cos(A_pitch)
-		G_yaw = -np.arctan2(My,Mx)
+		G_yaw = np.arctan2(My,Mx)
+		dt = self.vect_temps[2]
+		if gz > 0.01:
+			G_yaw =  G_yaw*0.5+0.5*(dt*gz+self.yaw)
 		return G_yaw,A_pitch,A_roll
 
 	def publish(self):
@@ -270,6 +271,8 @@ if __name__ == '__main__':
 	imu.offset = imu.get_calibration('previous')
 	imu.init_ekf()
 	th = 0
+	while imu.vect_temps[2] > 1:
+		rospy.sleep(0.5)
 	while not rospy.is_shutdown():
 		if imu.get == 1:
 			imu.get = 0
