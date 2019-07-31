@@ -1,11 +1,18 @@
+#include <std_msgs/Float32.h>
 
 /*****************************************************************************
  * Variables
  *****************************************************************************/
-#include <std_msgs/Float32.h>
+
 #define PIN_WIND A1
 #define MAX_WIND 970
 #define MIN_WIND 45
+
+std_msgs::Float32 windMsg;
+ros::Publisher pubWind("ardu_send_wind_direction",&windMsg);
+std_msgs::Float32 windSpeedMsg;
+ros::Publisher pubWindSpeed("ardu_send_wind_speed",&windSpeedMsg);
+
 float sensorValue =0;
 float angleWind =0;
 float ref = 0;
@@ -16,11 +23,6 @@ unsigned long t1wind;
 double windSpeed;
 int validWind = 0;
 double dt;
-
-std_msgs::Float32 windMsg;
-ros::Publisher pubWind("ardu_send_wind_direction",&windMsg);
-std_msgs::Float32 windSpeedMsg;
-ros::Publisher pubWindSpeed("ardu_send_wind_speed",&windSpeedMsg);
 
 
 /*****************************************************************************

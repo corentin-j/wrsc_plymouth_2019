@@ -1,6 +1,7 @@
-#include "I2Cdev.h"
+#include <I2Cdev.h>
 #include <ros.h>
 #include <Wire.h>
+#include "config_monohull.h"
 
 /*****************************************************************************
  * Variables
@@ -25,6 +26,7 @@ void setup() {
   imu_groove_setup();
   rc_receiver_setup();
   wind_setup();
+  motors_setup();
 }
 
 void loop() {

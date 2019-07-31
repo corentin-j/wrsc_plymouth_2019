@@ -1,7 +1,10 @@
+#include <geometry_msgs/Vector3.h>
 
 /*****************************************************************************
  * Variables
  *****************************************************************************/
+geometry_msgs::Vector3 rcMsg;
+ros::Publisher pubrcMsg("ardu_send_rc",&rcMsg);
 
 const int chPinRudder = 4; // channel 1 sur le pin 4
 const int chPinSail = 5; // channel 2 sur le pin 5
@@ -10,6 +13,11 @@ float chSail;
 
 unsigned long t0,t1;
 
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)
+{
+ return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 /*****************************************************************************
  * Program
  *****************************************************************************/
@@ -17,11 +25,13 @@ unsigned long t0,t1;
 void rc_receiver_setup() {
   pinMode(chPinRudder, INPUT);
   pinMode(chPinSail,INPUT);
+  
+  nh.advertise(pubrcMsg);
 }
 
 void rc_receiver_update() {
   t1 = millis();
-  chRudder = pulseIn(chPinRudder,HIGH,5000);
+  chRudder = pulseIn(chPinRudder,HIGH,SIGNAL_DURATION);
   if (chRudder==0)
   {
     t0 += millis()-t1;
@@ -29,27 +39,29 @@ void rc_receiver_update() {
   else
   {
     t0 = 0; // reset if there is a new data
-    /*Serial.print("Rudder : ");
-    Serial.print(chRudder);
-    Serial.print(", dt : ");
-    Serial.println(millis()-t1);*/
+    u_rudder = map(chRudder,minRudderRc,maxRudderRc,minRudderAngle,maxRudderAngle); // conversion
+    u_rudder = max(minRudderAngle,u_rudder);                                  // security
+    u_rudder = min(maxRudderAngle,u_rudder);                                  // security
+    rcMsg.x  = mapfloat(u_rudder,minRudderAngle,maxRudderAngle,-PI/4,PI/4);        // send the sail angle
   }
+  
   if (t0 > 100)
   {
-    /*Serial.print("No rc data, dt : ");
-    Serial.println(millis()-t1);*/
+    //Serial.print("No rc data");
     is_rc_on = 0;
   }
   else
   {
     is_rc_on = 1;
-    chSail = pulseIn(chPinSail,HIGH,5000);
+    chSail = pulseIn(chPinSail,HIGH,SIGNAL_DURATION);
     if (chSail != 0)
     {
-      /*Serial.print("Sail : ");
-      Serial.print(chSail);
-      Serial.print(", dt : ");
-      Serial.println(millis()-t1);*/
+      u_sail  = map(chSail,minSailRc,maxSailRc,minSailAngle,maxSailAngle); // conversion
+      u_sail  = max(minSailAngle,u_sail);                                  // security
+      u_sail  = min(maxSailAngle,u_sail);                                  // security
+      rcMsg.y = mapfloat(u_sail,minSailAngle,maxSailAngle,0,PI/2);        // send the sail angle
     }
   }
+  rcMsg.z = is_rc_on;
+  pubrcMsg.publish(&rcMsg);
 }
