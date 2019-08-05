@@ -8,6 +8,7 @@ import time
 import rospy
 from std_msgs.msg import Float32
 from geometry_msgs.msg import Vector3
+from gps_common.msg import GPSFix
 
 from filter_lib import *
 
@@ -19,22 +20,26 @@ def sawtooth(x):
 ##############################################################################################
 
 def sub_wind_direction(data): # Float32
-    global get, vect_temps, vect_wind_direction
-    wind_direction = data.data
-    #rospy.loginfo("wind_direction : %s", wind_direction)
-    t = time.time()
-    vect_temps = np.array([vect_temps[1],t,(t-vect_temps[1])])
-    vect_wind_direction = np.array([vect_wind_direction[1],wind_direction,sawtooth(wind_direction-vect_wind_direction[1])])
-    get = 1
+	global get, vect_temps, vect_wind_direction
+	wind_direction = data.data
+	#rospy.loginfo("wind_direction : %s", wind_direction)
+	t = time.time()
+	vect_temps = np.array([vect_temps[1],t,(t-vect_temps[1])])
+	vect_wind_direction = np.array([vect_wind_direction[1],wind_direction,sawtooth(wind_direction-vect_wind_direction[1])])
+	get = 1
 
 def sub_wind_speed(data): # Float32
-    global wind_speed
-    if data.data < 100:
-    	wind_speed = data.data
+	global wind_speed
+	if data.data < 100:
+		wind_speed = data.data
 
 def sub_euler_angles(data): # Vector3
-    global theta
-    theta = data.x
+	global theta
+	theta = data.x
+
+def sub_boat_speed(data): #GPSFix
+	global boat_speed, boat_timer
+	boat_speed = data.speed
 
 ##############################################################################################
 #      Filtre
@@ -106,9 +111,8 @@ if __name__ == '__main__':
 			true_wind     = np.arctan2(true_wind[1,0],true_wind[0,0])
 
 			wind_direction_msg.data = theta + wind_direction
-			rospy.loginfo("[{}] Vent apparent : {}, True wind : {} ".format(node_name,theta + wind_direction, true_wind))
 			pub_send_wind_direction.publish(wind_direction_msg)
-
 			wind_speed_msg.data = wind_speed
 			pub_send_wind_speed.publish(wind_speed_msg)
+			rospy.loginfo("[{}] Wind direction : {}, Wind speed : {} ".format(node_name, true_wind, wind_speed))
 
