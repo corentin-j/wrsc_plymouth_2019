@@ -27,10 +27,14 @@ def sub_wind_direction(data): # Float32
     vect_wind_direction = np.array([vect_wind_direction[1],wind_direction,sawtooth(wind_direction-vect_wind_direction[1])])
     get = 1
 
+def sub_wind_speed(data): # Float32
+    global wind_speed
+    if data.data < 100:
+    	wind_speed = data.data
+
 def sub_euler_angles(data): # Vector3
     global theta
-    theta = -data.x
-    #rospy.loginfo("theta : %s",theta*180/np.pi)
+    theta = data.x
 
 ##############################################################################################
 #      Filtre
@@ -58,18 +62,6 @@ def H(x):
 	return mat
 
 ##############################################################################################
-#      Display
-##############################################################################################
-
-def clear(ax):
-    plt.pause(0.001)
-    plt.cla()
-    a = 15
-    ax.set_xlim(-a,a)
-    ax.set_ylim(-a,a)
-    ax.set_zlim(-a,a)
-
-##############################################################################################
 #      Main
 ##############################################################################################
 
@@ -77,48 +69,46 @@ vect_wind_direction = np.array([0,0,0])
 get = 0
 vect_temps = np.array([0,0,0]) # t_prec, t_curr, dt
 theta = 0
+wind_speed = 0
+boat_speed = 0
 
 if __name__ == '__main__':
 	# kalman : https://pdfs.semanticscholar.org/7274/0405dcf42373fd4ed6fbd0a6f2d8d2208590.pdf
-	rospy.init_node('filtre_wind_direction')
+	node_name = 'filtre_wind_direction'
+	rospy.init_node(node_name)
 
-	rospy.Subscriber("ardu_send_euler_angles", Vector3, sub_euler_angles)
+	rospy.Subscriber("filter_send_euler_angles", Vector3, sub_euler_angles)
 	rospy.Subscriber("ardu_send_wind_direction", Float32, sub_wind_direction)
+	rospy.Subscriber("ardu_send_wind_speed", Float32, sub_wind_speed)
 	pub_send_wind_direction = rospy.Publisher('filter_send_wind_direction', Float32, queue_size=10)
+	pub_send_wind_speed = rospy.Publisher('filter_send_wind_speed', Float32, queue_size=10)
 	wind_direction_msg = Float32()
+	wind_speed_msg = Float32()
 
 	P0 = 10*np.eye(3)
 	Q = 0.028**2*np.eye(3)#0.028
 	R = 0.01*np.eye(3)
 	EKF_yaw   = Extended_kalman_filter(np.zeros((3,1)),P0,f,F,h,H,Q,R)
 	
-	l_temps,l_wind_raw,l_wind_EKF = [],[],[]
 
 	while not rospy.is_shutdown():
 
 		if get == 1: #each time we have a new value
 			get = 0
-			# ----  Extended Kalman Filter ------------------------------------------------- #
-
+			
 			z = np.array([[np.cos(vect_wind_direction[1])],[np.sin(vect_wind_direction[1])],[1]])
 			[x,P] = EKF_yaw.EKF_step(vect_wind_direction[2],z)
 			wind_direction = np.arctan2(x[1,0],x[0,0])
 
+			apparent_wind = np.array([[np.cos(theta + wind_direction)],[np.sin(theta + wind_direction)]])*wind_speed
+			boat_wind     = np.array([[np.cos(theta)],[np.sin(theta)]])*boat_speed
+			true_wind     = apparent_wind-boat_wind
+			true_wind     = np.arctan2(true_wind[1,0],true_wind[0,0])
+
 			wind_direction_msg.data = theta + wind_direction
-			rospy.loginfo("vent absolu : {}".format(theta + wind_direction))
+			rospy.loginfo("[{}] Vent apparent : {}, True wind : {} ".format(node_name,theta + wind_direction, true_wind))
 			pub_send_wind_direction.publish(wind_direction_msg)
-			#rospy.loginfo("Yaw : {}".format(yaw*180/np.pi))
 
-			l_temps.append(vect_temps[1])
-			l_wind_raw.append(vect_wind_direction[1]*180/np.pi)
-			l_wind_EKF.append(wind_direction*180/np.pi)
-
-			#plt.xlim((-1,1))
-			#plt.ylim((-1,1))
-			#plt.plot([0,cos(wind_direction)],[0, sin(wind_direction)])
-			#plt.plot([0,cos(vect_wind_direction[1])],[0, sin(vect_wind_direction[1])])
-			#plt.pause(0.01)
-			#plt.cla()
-
-
+			wind_speed_msg.data = wind_speed
+			pub_send_wind_speed.publish(wind_speed_msg)
 

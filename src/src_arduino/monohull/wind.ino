@@ -5,8 +5,8 @@
  *****************************************************************************/
 
 #define PIN_WIND A1
-#define MAX_WIND 970
-#define MIN_WIND 45
+#define MAX_WIND 1023
+#define MIN_WIND 0
 
 std_msgs::Float32 windMsg;
 ros::Publisher pubWind("ardu_send_wind_direction",&windMsg);
@@ -43,7 +43,7 @@ void wind_setup(){
 void wind_update(){
   sensorValue = analogRead(A1);
   angleWind = ((sensorValue-ref-MIN_WIND)/(MAX_WIND-MIN_WIND))*2*PI;
-  angleWind = 2*atan(tan(angleWind/2));
+  angleWind = -2*atan(tan(angleWind/2));
 
   wind_direction_publish();
 }

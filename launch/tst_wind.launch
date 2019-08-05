@@ -1,0 +1,12 @@
+<launch>
+
+	<node pkg="rosserial_arduino" type="serial_node.py" name="serial_node">
+		<param name="port" value="/dev/ttyACM0"/>
+		<param name="baud" value="250000"/>
+	</node>
+	<param name="calibration_mode" type="int" value="0" />
+	<node name="imu_9dof" pkg="WRSC_plymouth_JEGAT" type="imu_9dof.py" respawn="true" />
+
+	<node name="filter_wind" pkg="WRSC_plymouth_JEGAT" type="filter_wind.py" respawn="true" output='screen' />
+	
+</launch>
