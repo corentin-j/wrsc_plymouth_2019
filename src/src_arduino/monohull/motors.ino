@@ -12,6 +12,10 @@
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
+/*****************************************************************************
+ * Program
+ *****************************************************************************/
+
 int pulseWidth(int angle)
 {
   int pulse_wide, analog_value;
@@ -22,6 +26,12 @@ int pulseWidth(int angle)
 
 void motors_setup()
 {
-  pwm.setPWM(SAIL_PIN,0,pulseWidth(20));
-  delay(30);
+  pwm.begin();
+  pwm.setPWMFreq(FREQUENCY);
+}
+
+void motors_update()
+{
+  pwm.setPWM(RUDDER_PIN,0,pulseWidth(u_rudder));
+  pwm.setPWM(SAIL_PIN,0,pulseWidth(u_sail));
 }

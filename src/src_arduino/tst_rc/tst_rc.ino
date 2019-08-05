@@ -49,19 +49,20 @@ void loop() {
   else
   {
     t0 = 0; // reset if there is a new data
+    chRudder = pulseIn(chPinRudder,HIGH);
     Serial.print("Rudder : ");
     Serial.print(chRudder);
     Serial.print(", dt : ");
     Serial.println(millis()-t1);
   }
-  if (t0 > 100)
+  if (t0 > 300)
   {
-    //Serial.print("No rc data, dt : ");
-    //Serial.println(millis()-t1);
+    Serial.print("No rc data, dt : ");
+    Serial.println(millis()-t1);
   }
   else
   {
-    chSail = pulseIn(chPinSail,HIGH,5000);
+    chSail = pulseIn(chPinSail,HIGH,20000);
     if (chSail != 0)
     {
       Serial.print("Sail : ");

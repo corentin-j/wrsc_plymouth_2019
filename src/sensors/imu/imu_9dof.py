@@ -160,12 +160,12 @@ class Imu_9dof():
 		return offset
 
 	def get_calibration(self,your_calibration):
-		if your_calibration.lower() == 'previous':
+		if your_calibration == 0: # previous
 			offset = self.get_previous_calibration()
-		elif your_calibration.lower() == 'new':
+		elif your_calibration == 1: # new
 			self.calibration()
 			offset = self.get_previous_calibration()
-		else:
+		else: # no calibration
 			offset = np.zeros((9,1))
 			rospy.loginfo("WARNING : No chosen calibration")
 		return offset
@@ -220,7 +220,7 @@ class Imu_9dof():
 		[x,P] = self.ekf_roll.EKF_step(-self.vect_lp[4,0],z)
 		self.roll = np.arctan2(x[1,0],x[0,0])+0.008
 
-		rospy.loginfo(np.array([self.yaw,self.pitch,self.roll])*180/np.pi)
+		rospy.loginfo("[{}] {}".format(node_name,np.array([self.yaw,self.pitch,self.roll])*180/np.pi))
 		
 	###################################################################
 	#----- Euler angles ----------------------------------------------#
@@ -266,13 +266,17 @@ class Imu_9dof():
 
 
 if __name__ == '__main__':
-	rospy.init_node('imu_9dof')
+	node_name = 'imu_9dof'
+	rospy.init_node(node_name)
+	mode = rospy.get_param('calibration_mode',0)
 	imu = Imu_9dof("ardu_send_imu", "ardu_send_mag","filter_send_euler_angles")
-	imu.offset = imu.get_calibration('previous')
+	imu.offset = imu.get_calibration(mode)
 	imu.init_ekf()
 	th = 0
-	while imu.vect_temps[2] > 1:
+	rospy.loginfo("[{}] Waiting data from Arduino".format(node_name))
+	while (imu.vect_temps[2] > 1 or imu.vect_temps[2] == 0) and not rospy.is_shutdown():
 		rospy.sleep(0.5)
+	rospy.loginfo("[{}] Connected to Arduino, program starts".format(node_name))
 	while not rospy.is_shutdown():
 		if imu.get == 1:
 			imu.get = 0

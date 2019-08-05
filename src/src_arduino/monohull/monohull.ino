@@ -7,7 +7,7 @@
  * Variables
  *****************************************************************************/
 
-#define BAUDRATE 250000
+#define BAUDRATE 250000//250000
 
 ros::NodeHandle nh;
 I2Cdev   I2C_M;
@@ -34,4 +34,5 @@ void loop() {
   imu_groove_update();
   rc_receiver_update();
   wind_update();
+  motors_update();
 }

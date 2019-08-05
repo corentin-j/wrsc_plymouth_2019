@@ -31,7 +31,7 @@ void rc_receiver_setup() {
 
 void rc_receiver_update() {
   t1 = millis();
-  chRudder = pulseIn(chPinRudder,HIGH,SIGNAL_DURATION);
+  chRudder = pulseIn(chPinRudder,HIGH,6000);
   if (chRudder==0)
   {
     t0 += millis()-t1;
@@ -39,10 +39,10 @@ void rc_receiver_update() {
   else
   {
     t0 = 0; // reset if there is a new data
+    chRudder = pulseIn(chPinRudder,HIGH);
     u_rudder = map(chRudder,minRudderRc,maxRudderRc,minRudderAngle,maxRudderAngle); // conversion
-    u_rudder = max(minRudderAngle,u_rudder);                                  // security
-    u_rudder = min(maxRudderAngle,u_rudder);                                  // security
-    rcMsg.x  = mapfloat(u_rudder,minRudderAngle,maxRudderAngle,-PI/4,PI/4);        // send the sail angle
+    u_rudder = max(minRudderAngle,u_rudder);                                        // security
+    u_rudder = min(maxRudderAngle,u_rudder);                                        // security
   }
   
   if (t0 > 100)
@@ -53,15 +53,17 @@ void rc_receiver_update() {
   else
   {
     is_rc_on = 1;
-    chSail = pulseIn(chPinSail,HIGH,SIGNAL_DURATION);
+    chSail = pulseIn(chPinSail,HIGH,15000);
+    rcMsg.y = chSail;
     if (chSail != 0)
     {
       u_sail  = map(chSail,minSailRc,maxSailRc,minSailAngle,maxSailAngle); // conversion
       u_sail  = max(minSailAngle,u_sail);                                  // security
       u_sail  = min(maxSailAngle,u_sail);                                  // security
-      rcMsg.y = mapfloat(u_sail,minSailAngle,maxSailAngle,0,PI/2);        // send the sail angle
     }
   }
+  rcMsg.x  = u_rudder;//mapfloat(u_rudder,minRudderAngle,maxRudderAngle,-PI/4,PI/4);         // send the sail angle
+  //rcMsg.y = u_sail;//mapfloat(u_sail,minSailAngle,maxSailAngle,0,PI/2);         // send the sail angle
   rcMsg.z = is_rc_on;
   pubrcMsg.publish(&rcMsg);
 }

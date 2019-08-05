@@ -156,7 +156,7 @@ if __name__ == "__main__":
 	for i in range(1,nb_boats+1):
 		l_boats.append(Boat(i,lat_lon_origin))
 	for i in l_boats:
-		i.markers(3)
+		i.markers(6)
 		i.transform()
 
 	rate = rospy.Rate(10) # 10hz
