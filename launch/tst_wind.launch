@@ -5,8 +5,8 @@
 		<param name="baud" value="250000"/>
 	</node>
 	<param name="calibration_mode" type="int" value="0" />
-	<node name="imu_9dof" pkg="WRSC_plymouth_JEGAT" type="imu_9dof.py" respawn="true" />
+	<node name="imu_9dof" pkg="wrsc_plymouth_jegat" type="imu_9dof.py" respawn="true" />
 
-	<node name="filter_wind" pkg="WRSC_plymouth_JEGAT" type="filter_wind.py" respawn="true" output='screen' />
+	<node name="filter_wind" pkg="wrsc_plymouth_jegat" type="filter_wind.py" respawn="true" output='screen' />
 	
 </launch>

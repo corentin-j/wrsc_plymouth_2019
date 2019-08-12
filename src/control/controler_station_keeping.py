@@ -4,6 +4,11 @@ import numpy as np
 from numpy import cos,sin
 import utm
 
+import sys
+import rospkg
+rospack = rospkg.RosPack()
+pkg = rospack.get_path('wrsc_plymouth_jegat')
+sys.path.append(pkg+'/src/my_libs')
 import control_lib as cl
 
 import rospy

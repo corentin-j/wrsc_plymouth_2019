@@ -4,6 +4,6 @@
 	<node pkg="rostopic" type="rostopic" name="gps_origin" args="pub /launch_send_gps_origin geometry_msgs/Vector3 -- 50.695251 -4.236975 0" output="screen"/>
 
 
-	<node name="rviz_displayer_fleet" pkg="WRSC_plymouth_JEGAT" type="rviz_displayer_fleet.py" args="--test" respawn="true" output='screen' />
+	<node name="rviz_displayer_fleet" pkg="wrsc_plymouth_jegat" type="rviz_displayer_fleet.py" args="--test" respawn="true" output='screen' />
 	
 </launch>

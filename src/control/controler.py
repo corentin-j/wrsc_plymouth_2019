@@ -4,14 +4,19 @@ import numpy as np
 from numpy import cos,sin
 import utm
 
-import control_lib as cl
-
 import rospy
 from std_msgs.msg import Float32
 from geometry_msgs.msg import Vector3
 #from geometry_msgs.msg import Point
 from gps_common.msg import GPSFix
 from geometry_msgs.msg import Quaternion
+
+import sys
+import rospkg
+rospack = rospkg.RosPack()
+pkg = rospack.get_path('wrsc_plymouth_jegat')
+sys.path.append(pkg+'/src/my_libs')
+import control_lib as cl
 
 def sawtooth(x):
     return (x+np.pi)%(2*np.pi)-np.pi   # or equivalently   2*arctan(tan(x/2))

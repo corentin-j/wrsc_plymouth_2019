@@ -11,6 +11,11 @@ from sensor_msgs.msg import Imu
 from sensor_msgs.msg import MagneticField
 from geometry_msgs.msg import Vector3
 
+import sys
+import rospkg
+rospack = rospkg.RosPack()
+pkg = rospack.get_path('wrsc_plymouth_jegat')
+sys.path.append(pkg+'/src/my_libs')
 from filter_lib import *
 
 

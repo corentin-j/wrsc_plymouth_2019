@@ -54,7 +54,7 @@ class Marker_rviz():
 
 		self.marker.type = m_type
 		if m_type == 10:
-			self.marker.mesh_resource = "package://WRSC_plymouth_JEGAT/meshs/"+name+".STL"
+			self.marker.mesh_resource = "package://wrsc_plymouth_jegat/meshs/"+name+".STL"
 
 		self.pub_send_marker = rospy.Publisher('forrviz_send_'+name, Marker, queue_size=10)
 

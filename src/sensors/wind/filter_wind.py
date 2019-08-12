@@ -10,6 +10,11 @@ from std_msgs.msg import Float32
 from geometry_msgs.msg import Vector3
 from gps_common.msg import GPSFix
 
+import sys
+import rospkg
+rospack = rospkg.RosPack()
+pkg = rospack.get_path('wrsc_plymouth_jegat')
+sys.path.append(pkg+'/src/my_libs')
 from filter_lib import *
 
 def sawtooth(x):
