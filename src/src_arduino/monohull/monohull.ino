@@ -7,7 +7,7 @@
  * Variables
  *****************************************************************************/
 
-#define BAUDRATE 250000//250000
+#define BAUDRATE 115200//250000
 
 ros::NodeHandle nh;
 I2Cdev   I2C_M;

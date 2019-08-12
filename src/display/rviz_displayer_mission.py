@@ -13,6 +13,9 @@ from geometry_msgs.msg import Quaternion
 from std_msgs.msg import Float32
 from gps_common.msg import GPSFix
 
+def sawtooth(x):
+	return (x+np.pi)%(2*np.pi)-np.pi   # or equivalently   2*arctan(tan(x/2))
+
 ##############################################################################################
 #      Rviz
 ##############################################################################################
@@ -79,13 +82,6 @@ def sub_euler_angles(data):
 	pitch = data.y
 	roll = data.z
 
-def sub_xy(data):
-	global x, y, delta_s
-#	#rospy.loginfo("Pos x : %s, Pos y : %s",data.x, data.y)
-#	x = data.x
-#	y = data.y
-#	delta_s = data.z
-
 def sub_wind_direction(data):
 	global psi
 	psi = data.data
@@ -103,6 +99,7 @@ def sub_u_sail(data):
 	global delta_s
 	#rospy.loginfo("U_deltar : %s, U_deltamax : %s, Q : %s",data.x, data.y, data.z)
 	delta_s = data.data
+	delta_s = delta_s*np.sign(sawtooth(yaw-psi))
 
 def sub_gps_origin(data): # Vector3
 	global lat_lon_origin
@@ -116,14 +113,17 @@ def sub_gps(data): # Vector3
 	x = -(lat_lon_origin[1][1]-res[1])
 	y = lat_lon_origin[1][0]-res[0]
 
-def sub_lines_to_follow(data): # Quaternion
+def sub_line_begin(data): # Quaternion
 	global pline
 
 	res = utm.from_latlon(data.x, data.y)
 	pline[0][0] = -(lat_lon_origin[1][1]-res[1])
 	pline[0][1] = (lat_lon_origin[1][0]-res[0])
 
-	res = utm.from_latlon(data.z, data.w)
+def sub_line_end(data):
+	global pline
+
+	res = utm.from_latlon(data.x, data.y)
 	pline[1][0] = -(lat_lon_origin[1][1]-res[1])
 	pline[1][1] = (lat_lon_origin[1][0]-res[0])
 
@@ -134,6 +134,9 @@ def sub_zone_to_stay(data): # Vector3
 	zone_to_stay[0] = -(lat_lon_origin[1][1]-res[1])
 	zone_to_stay[1] = (lat_lon_origin[1][0]-res[0])
 
+def sub_thetabar(data):
+	global thetabar
+	thetabar = data.data
 
 ##############################################################################################
 #      Main
@@ -145,26 +148,30 @@ if __name__ == "__main__":
 	awind, psi = 1,-np.pi
 	delta_s, dr = 0,0
 	x, y = 0, 0
+	thetabar = 0
 	lat_lon_origin = [[],[]]
-	zone_to_stay = [0,0]
-	node_name = 'rviz_displayer_line_following'
+	zone_to_stay = [float('Nan'),float('Nan')]
+	node_name = 'rviz_displayer_mission'
 	rospy.init_node(node_name)
 	rospy.Subscriber("simu_send_theta", Vector3, sub_euler_angles)
-	#rospy.Subscriber("simu_send_xy", Point, sub_xy)
 	rospy.Subscriber("simu_send_gps", GPSFix, sub_gps)
 	rospy.Subscriber("simu_send_wind_direction", Float32, sub_wind_direction)
 	rospy.Subscriber("simu_send_wind_force", Float32, sub_wind_force)
 	rospy.Subscriber("control_send_u_rudder", Float32, sub_u_rudder)
 	rospy.Subscriber("control_send_u_sail", Float32, sub_u_sail)
+	rospy.Subscriber("control_send_thetabar", Float32, sub_thetabar)
 	rospy.Subscriber("launch_send_gps_origin", Vector3, sub_gps_origin)
-	rospy.Subscriber("control_send_lines_to_follow", Quaternion, sub_lines_to_follow)
+
+	rospy.Subscriber("control_send_line_begin", Vector3, sub_line_begin)
+	rospy.Subscriber("control_send_line_end", Vector3, sub_line_end)
 	rospy.Subscriber("control_send_zone_to_stay", Vector3, sub_zone_to_stay)
 
-	marker_boat   = Marker_rviz("boat",(-0.5,-0.24,-0.2),(np.pi/2, 0, np.pi/2),(0.0002,0.0002,0.0002),10,(0.9,0.08,0))
-	marker_rudder = Marker_rviz("rudder",(0.15,0,-0.2),(np.pi/2, 0, -np.pi/2),(0.0004,0.0004,0.0004),10)
-	marker_sail   = Marker_rviz("sail",(0.55,0,0),(np.pi/2, 0, -np.pi/2),(0.0002,0.0002,0.0002),10,(0.8,0.64,0.64))
-	marker_wind   = Marker_rviz("wind",(0,0,0),(0, 0, 0),(awind+0.01,0.1,0.1),0)
-	marker_line   = Marker_rviz("line",(0,0,0),(0, 0, 0),(.2,0,0),4,(0,1,1))
+	marker_boat     = Marker_rviz("boat",(-0.5,-0.24,-0.2),(np.pi/2, 0, np.pi/2),(0.0002,0.0002,0.0002),10,(0.9,0.08,0))
+	marker_rudder   = Marker_rviz("rudder",(0.15,0,-0.2),(np.pi/2, 0, -np.pi/2),(0.0004,0.0004,0.0004),10)
+	marker_sail     = Marker_rviz("sail",(0.55,0,0),(np.pi/2, 0, -np.pi/2),(0.0002,0.0002,0.0002),10,(0.8,0.64,0.64))
+	marker_wind     = Marker_rviz("wind",(0,0,0),(0, 0, 0),(awind+0.01,0.1,0.1),0)
+	marker_line     = Marker_rviz("line",(0,0,0),(0, 0, 0),(.2,0,0),4,(0,1,1))
+	marker_thetabar = Marker_rviz("thetabar",(0,0,0),(0, 0, 0),(3,0.2,0.2),0,(0,1,1))
 
 	marker_zone   = Marker_rviz("zone",(0,0,-0.2),(0, 0, 0),(30,30,0.1),3,(0,0.5,0))
 
@@ -182,6 +189,7 @@ if __name__ == "__main__":
 		marker_wind.publish()
 		marker_line.publish()
 		marker_zone.publish()
+		marker_thetabar.publish()
 		rate.sleep()
 
 		br_boat = tf.TransformBroadcaster()
@@ -196,5 +204,7 @@ if __name__ == "__main__":
 		br_line.sendTransform((0,0,0),(quaternion_from_euler(0,0,0)),rospy.Time.now(),"line","map")
 		br_zone = tf.TransformBroadcaster()
 		br_zone.sendTransform((zone_to_stay[0],zone_to_stay[1],0),(quaternion_from_euler(0,0,0)),rospy.Time.now(),"zone","map")
+		br_thetabar = tf.TransformBroadcaster()
+		br_thetabar.sendTransform((x,y,0),(quaternion_from_euler(0,0,thetabar)),rospy.Time.now(),"thetabar","map")
 
 		marker_line.set_points(pline[0],pline[1])

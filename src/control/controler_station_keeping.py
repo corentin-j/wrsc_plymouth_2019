@@ -51,18 +51,13 @@ def sub_theta(data):
 	#rospy.loginfo("Imu heading %s ",data.orientation.x)
 	theta = data.x
 
-def sub_lines_to_follow(data): # Quaternion
-	global a,b
+def sub_zone_to_stay(data): # Vector3
+	global zone_to_stay
 
 	res = utm.from_latlon(data.x, data.y)
-	ax = -(lat_lon_origin[1][1]-res[1])
-	ay = (lat_lon_origin[1][0]-res[0])
-	a = np.array([[ax],[ay]])
-
-	res = utm.from_latlon(data.z, data.w)
-	bx = -(lat_lon_origin[1][1]-res[1])
-	by = (lat_lon_origin[1][0]-res[0])
-	b = np.array([[bx],[by]])
+	zone_to_stay[0] = -(lat_lon_origin[1][1]-res[1])
+	zone_to_stay[1] = (lat_lon_origin[1][0]-res[0])
+	print(zone_to_stay)
 
 
 ##############################################################################################
@@ -72,14 +67,13 @@ def sub_lines_to_follow(data): # Quaternion
 pos_x, pos_y= 0, 0
 awind,psi = 0, 0
 theta = 0
-lat_lon_origin = [[],[]]
+lat_lon_origin = [[0,0],[0,0]]
+zone_to_stay = [0,0]
+u = [0,0]
 
 if __name__ == '__main__':
 
-	a = array([[0],[0]])   
-	b = array([[5],[5]])
-	q = -1
-	node_name = 'controler'
+	node_name = 'controler_station_keeping'
 	rospy.init_node(node_name)
 	rospy.Subscriber("simu_send_theta", Vector3, sub_theta)
 	#rospy.Subscriber("simu_send_xy", Point, sub_xy)
@@ -87,7 +81,7 @@ if __name__ == '__main__':
 	rospy.Subscriber("simu_send_wind_force", Float32, sub_wind_force)
 	rospy.Subscriber("launch_send_gps_origin", Vector3, sub_gps_origin)
 	rospy.Subscriber("simu_send_gps", GPSFix, sub_gps)
-	rospy.Subscriber("control_send_lines_to_follow", Quaternion, sub_lines_to_follow)
+	rospy.Subscriber("control_send_zone_to_stay", Vector3, sub_zone_to_stay)
 
 	pub_send_u_rudder = rospy.Publisher('control_send_u_rudder', Float32, queue_size=10)
 	pub_send_u_sail   = rospy.Publisher('control_send_u_sail', Float32, queue_size=10)
@@ -98,14 +92,23 @@ if __name__ == '__main__':
 		rospy.sleep(0.5)
 		rospy.loginfo("[{}] Waiting GPS origin".format(node_name))
 	rospy.loginfo("[{}] Got GPS origin {}".format(node_name,lat_lon_origin))
+	while zone_to_stay == [0,0] and not rospy.is_shutdown():
+		rospy.sleep(0.5)
+		rospy.loginfo("[{}] Waiting zone_to_stay {}".format(node_name, zone_to_stay))
+	rospy.loginfo("[{}] Zone_to_stay {}".format(node_name,zone_to_stay))
 	
+	zone = 1
+
 	rate = rospy.Rate(10)
 	while not rospy.is_shutdown():
 		x = array([[pos_x,pos_y,theta]]).T
 		
-		fut_x = x + 4*array([[np.cos(theta),np.sin(theta),0]]).T
-		thetabar = cl.get_thetabar_line_following(x,q,a,b,psi)
-		u = cl.control_line_following(fut_x,thetabar,psi)
+		fut_x = x + 1*array([[np.cos(theta),np.sin(theta),0]]).T
+
+		params = [zone_to_stay[0],zone_to_stay[1],psi,5,3]
+		thetabar, zone, display = cl.get_thetabar_station_keeping(params,x,zone)
+		u = cl.control_station_keeping(thetabar,fut_x,psi)
+		rospy.loginfo("[{}] Zone {}, {}".format(node_name,zone,thetabar))
 
 		u_rudder_msg.data = u[0,0]
 		u_sail_msg.data = u[1,0]

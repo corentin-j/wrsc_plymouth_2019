@@ -220,7 +220,7 @@ class Imu_9dof():
 		[x,P] = self.ekf_roll.EKF_step(-self.vect_lp[4,0],z)
 		self.roll = np.arctan2(x[1,0],x[0,0])+0.008
 
-		rospy.loginfo("[{}] {}".format(node_name,np.array([self.yaw,self.pitch,self.roll])*180/np.pi))
+		#rospy.loginfo("[{}] {}".format(node_name,np.array([self.yaw,self.pitch,self.roll])*180/np.pi))
 		
 	###################################################################
 	#----- Euler angles ----------------------------------------------#
@@ -278,7 +278,11 @@ if __name__ == '__main__':
 		rospy.sleep(0.5)
 	rospy.loginfo("[{}] Connected to Arduino, program starts".format(node_name))
 	while not rospy.is_shutdown():
+		t0 = time.time()
 		if imu.get == 1:
 			imu.get = 0
 			imu.kalman_compute()
 			imu.publish()
+		t1 = time.time()
+		pause = imu.vect_temps[2]/2-(t1-t0)
+		rospy.sleep(pause)

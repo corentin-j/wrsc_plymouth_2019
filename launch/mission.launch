@@ -1,0 +1,14 @@
+<launch>
+
+
+	<node name="mission" pkg="WRSC_plymouth_JEGAT" type="mission.py" args="--test" output='screen' />
+	<node name="simu_boat" pkg="WRSC_plymouth_JEGAT" type="simu_boat.py" args="--test" respawn="true" output='screen' />
+
+	<node type="rviz" name="rviz_station_keeping" pkg="rviz" />
+	<node name="rviz_displayer_mission" pkg="WRSC_plymouth_JEGAT" type="rviz_displayer_mission.py" args="--test" respawn="true" output='screen' />
+
+	
+
+	
+
+</launch>

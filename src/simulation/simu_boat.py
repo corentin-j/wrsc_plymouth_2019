@@ -7,7 +7,6 @@ import utm
 
 import rospy
 from std_msgs.msg import Float32
-from geometry_msgs.msg import Point
 from geometry_msgs.msg import Vector3
 from gps_common.msg import GPSFix
 
@@ -66,21 +65,22 @@ if __name__ == '__main__':
 
     # --- Boat variables --- #
 
-    p0,p1,p2,p3,p4,p5,p6,p7,p8,p9 = 0.1,1,6000,1000,2000,1,1,2,300,10000
-    x = np.array([[10,-10,-2*np.pi/3,1,0]]).T #x=(x,y,theta,v,w)
+    p0,p1,p2,p3,p4,p5,p6,p7,p8,p9 = 0.1,0.1,0.5,3,1,0,0,0.5,10,1 #0.1,1,6000,1000,2000,1,1,2,300,10000
+    x = np.array([[0,0,0,1,0]]).T #x=(x,y,theta,v,w)
     dt = 0.1
     pi = np.pi
-    awind,psi = 2,0.1 #2,-2
+    awind,psi = 2,-1 #2,-2
+    u = [0,0]
 
     # --- ROS -------------- #
 
     pub_send_theta           = rospy.Publisher('simu_send_theta', Vector3, queue_size=10)
-    pub_send_xy              = rospy.Publisher('simu_send_xy', Point, queue_size=10)
+    pub_send_xy              = rospy.Publisher('simu_send_xy', Vector3, queue_size=10)
     pub_send_wind_direction  = rospy.Publisher('simu_send_wind_direction', Float32, queue_size=10)
     pub_send_wind_force      = rospy.Publisher('simu_send_wind_force', Float32, queue_size=10)
     pub_send_gps             = rospy.Publisher('simu_send_gps', GPSFix, queue_size=10)
     theta_msg          = Vector3()
-    xy_msg             = Point()
+    xy_msg             = Vector3()
     wind_direction_msg = Float32()
     wind_force_msg     = Float32()
     gps_msg            = GPSFix()

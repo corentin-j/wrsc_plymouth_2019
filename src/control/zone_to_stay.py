@@ -37,7 +37,7 @@ if __name__ == '__main__':
 	zone_to_stay_msg = Vector3()
 	lines_to_follow_msg = Quaternion()
 
-	centre = [50.695396,-4.236313]
+	centre = [50.695,-4.236]
 	zone_to_stay_msg.x = centre[0]
 	zone_to_stay_msg.y = centre[1]
 	utm_centre = utm.from_latlon(centre[0],centre[1])

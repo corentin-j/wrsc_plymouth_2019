@@ -1,0 +1,9 @@
+# Spacer = ' '
+# ex : mode arg1 arg2 arg3
+
+Cap following : 	mode=0
+	            	args=thetabar,temps
+Line following : 	mode=1
+					args=pointA_lat,pointA_lon,pointB_lat,pointB_lon
+Station_keeping : 	mode=2
+					args=point_lat,point_lon,temps

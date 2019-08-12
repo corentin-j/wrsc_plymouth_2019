@@ -97,6 +97,7 @@ if __name__ == '__main__':
 	
 
 	while not rospy.is_shutdown():
+		t0 = time.time()
 
 		if get == 1: #each time we have a new value
 			get = 0
@@ -116,3 +117,6 @@ if __name__ == '__main__':
 			pub_send_wind_speed.publish(wind_speed_msg)
 			rospy.loginfo("[{}] Wind direction : {}, Wind speed : {} ".format(node_name, true_wind, wind_speed))
 
+		t1 = time.time()
+		pause = vect_temps[2]/2-(t1-t0)
+		rospy.sleep(pause)

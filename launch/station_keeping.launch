@@ -1,10 +1,11 @@
 <launch>
 
-	<node type="rviz" name="rviz" pkg="rviz" />
-	<node pkg="rostopic" type="rostopic" name="gps_origin" args="pub /launch_send_gps_origin geometry_msgs/Vector3 -- 50.695251 -4.236975 0" output="screen"/>
-	<node name="simu_boat" pkg="WRSC_plymouth_JEGAT" type="simu_boat.py" args="--test" respawn="true" output='screen' />
-	<node name="controler" pkg="WRSC_plymouth_JEGAT" type="controler.py" args="--test" respawn="true" output='screen' />
-	<node name="rviz_displayer_station_keeping" pkg="WRSC_plymouth_JEGAT" type="rviz_displayer_station_keeping.py" args="--test" respawn="true" output='screen' />
+	<node type="rviz" name="rviz_station_keeping" pkg="rviz" args="-d /home/.rviz/station_keeping.rviz" />
+
+	<node pkg="rostopic" type="rostopic" name="gps_origin" args="pub /launch_send_gps_origin geometry_msgs/Vector3 -- 50.695396 -4.236313 0" />
 	<node name="zone_to_stay" pkg="WRSC_plymouth_JEGAT" type="zone_to_stay.py" args="--test" respawn="true" output='screen' />
-	
+	<node name="simu_boat" pkg="WRSC_plymouth_JEGAT" type="simu_boat.py" args="--test" respawn="true" output='screen' />
+	<node name="controler_station_keeping" pkg="WRSC_plymouth_JEGAT" type="controler_station_keeping.py" args="--test" respawn="true" output='screen' />
+	<node name="rviz_displayer_station_keeping" pkg="WRSC_plymouth_JEGAT" type="rviz_displayer_station_keeping.py" args="--test" respawn="true" output='screen' />
+
 </launch>
