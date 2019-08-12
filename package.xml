@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>WRSC_plymouth_JEGAT</name>
+  <name>wrsc_plymouth_jegat</name>
   <version>0.0.0</version>
-  <description>The WRSC_plymouth_JEGAT package</description>
+  <description>The wrsc_plymouth_jegat package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/WRSC_plymouth_JEGAT</url> -->
+  <!-- <url type="website">http://wiki.ros.org/wrsc_plymouth_jegat</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->

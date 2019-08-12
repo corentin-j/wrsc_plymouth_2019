@@ -150,7 +150,7 @@ if __name__ == "__main__":
 	x, y = 0, 0
 	thetabar = 0
 	lat_lon_origin = [[],[]]
-	zone_to_stay = [float('Nan'),float('Nan')]
+	zone_to_stay = [100000,100000]
 	node_name = 'rviz_displayer_mission'
 	rospy.init_node(node_name)
 	rospy.Subscriber("simu_send_theta", Vector3, sub_euler_angles)

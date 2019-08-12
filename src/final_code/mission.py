@@ -99,6 +99,8 @@ if __name__ == '__main__':
 	gps_origin_msg.y = mission_tab[0][2]
 	rospy.sleep(1)
 	pub_send_gps_origin.publish(gps_origin_msg)
+	rospy.sleep(1)
+	pub_send_gps_origin.publish(gps_origin_msg)
 
 
 	mission_tab = mission_tab[1:][:]
