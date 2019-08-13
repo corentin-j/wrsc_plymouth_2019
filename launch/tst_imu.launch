@@ -5,7 +5,11 @@
 		<param name="baud" value="115200"/>
 	</node>
 
-	<param name="calibration_mode" type="int" value="1" />
+	
+
+	<arg name="calibration" default="0" />
+    <param name="calibration_mode" type="int" value="$(arg calibration)" />
+
 	<node name="imu_9dof" pkg="wrsc_plymouth_jegat" type="imu_9dof.py" respawn="true" output='screen' />
 	
 </launch>
