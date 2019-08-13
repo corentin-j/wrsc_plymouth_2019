@@ -119,7 +119,7 @@ class Imu_9dof():
 		rospy.loginfo("\tGyrometrers calibration ends")
 		return -np.mean(lgx), -np.mean(lgy), -np.mean(lgz)
 
-	def calibration_magnetometer(self,number_of_sec=300):
+	def calibration_magnetometer(self,number_of_sec=60):
 		"""
 		Return the offset of the magnetometer
 		"""
@@ -257,8 +257,8 @@ class Imu_9dof():
 		My = mx*sin(A_roll)*sin(A_pitch)+my*cos(A_roll)-mz*sin(A_roll)*cos(A_pitch)
 		G_yaw = np.arctan2(My,Mx)
 		dt = self.vect_temps[2]
-		if gz > 0.01:
-			G_yaw =  G_yaw*0.5+0.5*(dt*gz+self.yaw)
+		#if gz > 0.01:
+		#	G_yaw =  G_yaw*0.5+0.5*(dt*gz+self.yaw)
 		return G_yaw,A_pitch,A_roll
 
 	def publish(self):
