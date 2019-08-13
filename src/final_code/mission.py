@@ -6,6 +6,7 @@ import os
 import rospy
 from std_msgs.msg import Float32
 from geometry_msgs.msg import Vector3
+from geometry_msgs.msg import Pose2D
 from gps_common.msg import GPSFix
 
 import sys
@@ -121,8 +122,8 @@ if __name__ == '__main__':
 	pub_send_u_rudder     = rospy.Publisher('control_send_u_rudder', Float32, queue_size=10)
 	pub_send_u_sail       = rospy.Publisher('control_send_u_sail', Float32, queue_size=10)
 	pub_send_thetabar     = rospy.Publisher('control_send_thetabar', Float32, queue_size=10)
-	pub_send_line_begin   = rospy.Publisher('control_send_line_begin', Vector3, queue_size=10)
-	pub_send_line_end     = rospy.Publisher('control_send_line_end', Vector3, queue_size=10)
+	pub_send_line_begin   = rospy.Publisher('control_send_line_begin', Pose2D, queue_size=10)
+	pub_send_line_end     = rospy.Publisher('control_send_line_end', Pose2D, queue_size=10)
 	pub_send_zone_to_stay = rospy.Publisher('control_send_zone_to_stay', Vector3, queue_size=10)
 	u_rudder_msg = Float32()
 	u_sail_msg   = Float32()

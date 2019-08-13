@@ -10,6 +10,7 @@ import numpy as np
 from geometry_msgs.msg import Vector3
 from geometry_msgs.msg import Point
 from geometry_msgs.msg import Quaternion
+from geometry_msgs.msg import Pose2D
 from std_msgs.msg import Float32
 from gps_common.msg import GPSFix
 
@@ -162,8 +163,8 @@ if __name__ == "__main__":
 	rospy.Subscriber("control_send_thetabar", Float32, sub_thetabar)
 	rospy.Subscriber("launch_send_gps_origin", Vector3, sub_gps_origin)
 
-	rospy.Subscriber("control_send_line_begin", Vector3, sub_line_begin)
-	rospy.Subscriber("control_send_line_end", Vector3, sub_line_end)
+	rospy.Subscriber("control_send_line_begin", Pose2D, sub_line_begin)
+	rospy.Subscriber("control_send_line_end", Pose2D, sub_line_end)
 	rospy.Subscriber("control_send_zone_to_stay", Vector3, sub_zone_to_stay)
 
 	marker_boat     = Marker_rviz("boat",(-0.5,-0.24,-0.2),(np.pi/2, 0, np.pi/2),(0.0002,0.0002,0.0002),10,(0.9,0.08,0))
