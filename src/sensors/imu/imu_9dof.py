@@ -119,7 +119,7 @@ class Imu_9dof():
 		rospy.loginfo("\tGyrometrers calibration ends")
 		return -np.mean(lgx), -np.mean(lgy), -np.mean(lgz)
 
-	def calibration_magnetometer(self,number_of_sec=10):
+	def calibration_magnetometer(self,number_of_sec=300):
 		"""
 		Return the offset of the magnetometer
 		"""
