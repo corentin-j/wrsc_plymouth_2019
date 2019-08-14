@@ -25,7 +25,7 @@ def sawtooth(x):
 ##############################################################################################
 
 def sub_wind_direction(data): # Float32
-	rospy.loginfo("[{}] I see wind direction".format(node_name))
+	#rospy.loginfo("[{}] I see wind direction".format(node_name))
 	global get, vect_temps, vect_wind_direction
 	wind_direction = data.data
 	#rospy.loginfo("wind_direction : %s", wind_direction)
@@ -35,7 +35,7 @@ def sub_wind_direction(data): # Float32
 	get = 1
 
 def sub_wind_speed(data): # Float32
-	rospy.loginfo("[{}] I see wind direction".format(node_name))
+	#rospy.loginfo("[{}] I see wind speed".format(node_name))
 	global wind_speed
 	if data.data < 100:
 		wind_speed = data.data
