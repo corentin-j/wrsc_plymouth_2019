@@ -9,7 +9,7 @@
  * Global
  *****************************************************************************/
 ros::NodeHandle nh;
-MPU9250 accelgyro;
+MPU9250 accelgyro(0x68);
 I2Cdev   I2C_M;
 
 /*****************************************************************************
@@ -26,9 +26,9 @@ int16_t ax,ay,az, gx,gy,gz, mx,my,mz;
 
 void setup() {
   // put your setup code here, to run once:
-  nh.getHardware()->setBaud(250000);
+  nh.getHardware()->setBaud(115200);
   nh.initNode();
-  Serial.begin(250000);
+  Serial.begin(115200);
   Wire.begin();
   Serial.println("Initializing I2C devices...");
   accelgyro.initialize();

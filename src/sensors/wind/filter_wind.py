@@ -95,6 +95,8 @@ if __name__ == '__main__':
 	wind_direction_msg = Float32()
 	wind_speed_msg = Float32()
 
+	rospy.sleep(1)
+
 	P0 = 10*np.eye(3)
 	Q = 0.028**2*np.eye(3)#0.028
 	R = 0.01*np.eye(3)
@@ -124,4 +126,5 @@ if __name__ == '__main__':
 
 		t1 = time.time()
 		pause = vect_temps[2]/2-(t1-t0)
+		rospy.loginfo("[{}] Pause : {}".format(node_name,pause))
 		rospy.sleep(pause)

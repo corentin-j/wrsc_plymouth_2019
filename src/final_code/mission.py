@@ -70,16 +70,26 @@ if __name__ == '__main__':
 
 	node_name = 'mission'
 	rospy.init_node(node_name)
+	simu = rospy.get_param('simu',0)
+	mission_txt = rospy.get_param('mission',"mission.txt")
+	print(mission_txt)
 	rospy.Subscriber("launch_send_gps_origin", Vector3, sub_gps_origin)
-	rospy.Subscriber("simu_send_gps", GPSFix, sub_gps)
-	rospy.Subscriber("simu_send_wind_direction", Float32, sub_wind_direction)
-	rospy.Subscriber("simu_send_wind_force", Float32, sub_wind_force)
-	rospy.Subscriber("simu_send_theta", Vector3, sub_euler_angles)
+	if simu == 1:
+		rospy.Subscriber("simu_send_gps", GPSFix, sub_gps)
+		rospy.Subscriber("simu_send_wind_direction", Float32, sub_wind_direction)
+		rospy.Subscriber("simu_send_wind_force", Float32, sub_wind_force)
+		rospy.Subscriber("simu_send_theta", Vector3, sub_euler_angles)
+	else:
+		rospy.Subscriber("filter_send_gps", GPSFix, sub_gps)
+		rospy.Subscriber("filter_send_wind_direction", Float32, sub_wind_direction)
+		rospy.Subscriber("filter_send_wind_force", Float32, sub_wind_force)
+		rospy.Subscriber("filter_send_euler_angles", Vector3, sub_euler_angles)
+
 
 	#####	Load mission table	######################################
 
 	THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
-	my_file = os.path.join(THIS_FOLDER, 'mission.txt')
+	my_file = os.path.join(THIS_FOLDER, mission_txt)
 	f = open(my_file,'r')
 	doc = f.readlines()
 	f.close()
@@ -128,8 +138,8 @@ if __name__ == '__main__':
 	u_rudder_msg = Float32()
 	u_sail_msg   = Float32()
 	thetabar_msg = Float32()
-	line_begin_msg = Vector3()
-	line_end_msg   = Vector3()
+	line_begin_msg = Pose2D()
+	line_end_msg   = Pose2D()
 	zone_to_stay_msg = Vector3()
 
 	#####	Trough mission table	##################################
@@ -166,8 +176,11 @@ if __name__ == '__main__':
 			print('theta_line ',theta_line)
 			line_begin_msg.x, line_begin_msg.y = mission[1], mission[2]
 			line_end_msg.x, line_end_msg.y = mission[3], mission[4]
-			pub_send_line_begin.publish(line_begin_msg)
-			pub_send_line_end.publish(line_end_msg)
+
+			for i in range(5):
+				pub_send_line_begin.publish(line_begin_msg)
+				pub_send_line_end.publish(line_end_msg)
+				rospy.sleep(0.1)
 
 			out_of_zone = False
 			while (not out_of_zone) and (not rospy.is_shutdown()):
@@ -186,7 +199,9 @@ if __name__ == '__main__':
 		if mission[0] == 2:
 			rospy.loginfo("[{}] Station keeping around {},{}".format(node_name,mission[1],mission[2]))
 			zone_to_stay_msg.x, zone_to_stay_msg.y = mission[1], mission[2]
-			pub_send_zone_to_stay.publish(zone_to_stay_msg)
+			for i in range(5):
+				pub_send_zone_to_stay.publish(zone_to_stay_msg)
+				rospy.sleep(0.1)
 			res = utm.from_latlon(mission[1], mission[2])
 			px = -(lat_lon_origin[1][1]-res[1])
 			py = (lat_lon_origin[1][0]-res[0])

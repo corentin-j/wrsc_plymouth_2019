@@ -1,7 +1,12 @@
 <launch>
 
+	<arg name="simulation" default="0" />
+    <param name="simu" type="int" value="$(arg simulation)" />
 
+    <arg name="mission" default="mission.txt" />
+    <param name="mission" type="String" value="$(arg mission)" />
 	<node name="mission" pkg="wrsc_plymouth_jegat" type="mission.py" args="--test" output='screen' />
+
 	<node name="simu_boat" pkg="wrsc_plymouth_jegat" type="simu_boat.py" args="--test" respawn="true" output='screen' />
 
 	<node type="rviz" name="rviz_station_keeping" pkg="rviz" />
