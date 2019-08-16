@@ -82,7 +82,7 @@ if __name__ == '__main__':
 	else:
 		rospy.Subscriber("filter_send_gps", GPSFix, sub_gps)
 		rospy.Subscriber("filter_send_wind_direction", Float32, sub_wind_direction)
-		rospy.Subscriber("filter_send_wind_force", Float32, sub_wind_force)
+		rospy.Subscriber("filter_send_wind_speed", Float32, sub_wind_force)
 		rospy.Subscriber("filter_send_euler_angles", Vector3, sub_euler_angles)
 
 
