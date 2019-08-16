@@ -8,6 +8,7 @@
 	<node pkg="wrsc_plymouth_jegat" type="filter_wind.py" name="filter_wind" />
 	<node pkg="wrsc_plymouth_jegat" type="imu_9dof.py" name="imu_9dof"/>
 	<node pkg="trimaran_ros" type="gps.py" name="gps" />
+	<node pkg="trimaran_ros" type="mode" name="mode" />
 
 	<node name="mission" pkg="wrsc_plymouth_jegat" type="mission.py" args="--test" output='screen' />
 		<arg name="simulation" default="0" />
