@@ -127,6 +127,8 @@ if __name__ == '__main__':
 	while (len(everything_is_ready) != np.sum(everything_is_ready)) and (not rospy.is_shutdown()):
 		rospy.sleep(0.5)
 		rospy.loginfo("[{}] Got {}/{} subscribers ready".format(node_name,int(np.sum(everything_is_ready)),len(everything_is_ready)))
+		rospy.loginfo("[{}] EiR {}".format(node_name,everything_is_ready))
+		
 	rospy.loginfo("[{}] All subscribers ready".format(node_name))
 
 	pub_send_u_rudder     = rospy.Publisher('control_send_u_rudder', Float32, queue_size=10)
