@@ -1,22 +1,19 @@
 <launch>
 
-	
+	<arg name="simulation" default="0" />
+    <param name="simu" type="int" value="$(arg simulation)" />
+
+    <arg name="mission" default="mission.txt" />
+    <param name="mission" type="String" value="$(arg mission)" />
 	<node name="mission" pkg="wrsc_plymouth_jegat" type="mission.py" args="--test" output='screen' />
-		<arg name="simulation" default="0" />
-		<param name="simu" type="int" value="$(arg simulation)" />
-		<arg name="mission" default="mission.txt" />
-		<param name="mission" type="String" value="$(arg mission)" />
 
 	<node name="simu_boat" pkg="wrsc_plymouth_jegat" type="simu_boat.py" args="--test" respawn="true" output='screen' />
 
-	<node pkg="rosserial_arduino" type="serial_node.py" name="serial_node" output="screen">
-		<param name="port" value="/dev/ttyACM0"/>
-		<param name="baud" value="115200"/>
-	</node>
+	<node type="rviz" name="rviz_station_keeping" pkg="rviz" />
+	<node name="rviz_displayer_mission" pkg="wrsc_plymouth_jegat" type="rviz_displayer_mission.py" args="--test" respawn="true" output='screen' />
 
-	<node pkg="trimaran_ros" type="mode" name="mode" />
-	<node pkg="wrsc_plymouth_jegat" type="filter_wind.py" name="filter_wind" />
-	<node pkg="wrsc_plymouth_jegat" type="imu_9dof.py" name="imu_9dof"/>
-	<node pkg="trimaran_ros" type="gps.py" name="gps" />	
+	
+
+	
 
 </launch>
