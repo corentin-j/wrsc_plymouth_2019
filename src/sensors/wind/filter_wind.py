@@ -130,4 +130,4 @@ if __name__ == '__main__':
 		t1 = time.time()
 		pause = vect_temps[2]/2-(t1-t0)
 		#rospy.loginfo("[{}] Pause : {}".format(node_name,pause))
-		rospy.sleep(pause)
+		rospy.sleep(0.1) #pause
