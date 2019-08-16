@@ -154,7 +154,6 @@ if __name__ == '__main__':
 				thetabar = mission[1]
 				theta = x[2,0]
 				u_rudder, u_sail = cl.control_cap_following(theta,thetabar,psi,2)
-				print(psi)
 
 				u_rudder_msg.data = u_rudder
 				u_sail_msg.data = u_sail

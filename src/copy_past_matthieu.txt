@@ -1,0 +1,3 @@
+roslaunch outdoor_mission.launch mission="cap_follow.txt"
+roslaunch outdoor_mission.launch mission="line_follow.txt"
+roslaunch outdoor_mission.launch mission="station_keeping.txt"
