@@ -17,10 +17,6 @@
 	<node pkg="trimaran_ros" type="mode" name="mode" />
 	<node pkg="wrsc_plymouth_jegat" type="filter_wind.py" name="filter_wind" />
 	<node pkg="wrsc_plymouth_jegat" type="imu_9dof.py" name="imu_9dof"/>
-	<node pkg="trimaran_ros" type="gps.py" name="gps" />
-
-	<node type="rviz" name="rviz_station_keeping" pkg="rviz" />
-	<node name="rviz_displayer_mission" pkg="wrsc_plymouth_jegat" type="rviz_displayer_mission.py" args="--test" respawn="true" output='screen' />
-	
+	<node pkg="trimaran_ros" type="gps.py" name="gps" />	
 
 </launch>
