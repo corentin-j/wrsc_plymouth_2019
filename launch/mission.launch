@@ -13,7 +13,7 @@
 	<node name="rviz_displayer_mission" pkg="wrsc_plymouth_jegat" type="rviz_displayer_mission.py" args="--test" respawn="true" output='screen' />
 
 	
-
+	<node name="record" pkg="rosbag" type="record" args="record -a -o $(find trimaran_ros)/rosbag/TestMission" />
 	
 
 </launch>
