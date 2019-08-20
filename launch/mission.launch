@@ -1,6 +1,5 @@
 <launch>
 
-
 	<node name="mission" pkg="wrsc_plymouth_jegat" type="mission.py" args="--test" output='screen' />
 		<arg name="simulation" default="0" />
 		<param name="simu" type="int" value="$(arg simulation)" />
