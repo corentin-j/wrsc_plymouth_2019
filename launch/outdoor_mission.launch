@@ -18,4 +18,6 @@
 		<arg name="m_mode" default="0" />
 		<param name="m_mode" type="int" value="$(arg m_mode)" />
 
+	<node name="record" pkg="rosbag" type="record" args="record -a -o $(find wrsc_plymouth_jegat)/rosbags/rsbg_mission" />
+
 </launch>
