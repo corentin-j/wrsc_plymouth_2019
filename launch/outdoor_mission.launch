@@ -16,4 +16,6 @@
 		<arg name="mission" default="mission.txt" />
 		<param name="mission" type="String" value="$(arg mission)" />
 
-<\launch>
+
+
+</launch>
