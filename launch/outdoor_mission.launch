@@ -15,8 +15,3 @@
 		<param name="simu" type="int" value="$(arg simulation)" />
 		<arg name="mission" default="mission.txt" />
 		<param name="mission" type="String" value="$(arg mission)" />
-
-
-	<node name="record" pkg="rosbag" type="record" args="record -a -o $(find wrsc_plymouth_jegat)/rosbag/TestMission" />
-
-</launch>
