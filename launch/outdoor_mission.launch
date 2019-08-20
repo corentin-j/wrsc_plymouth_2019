@@ -17,6 +17,6 @@
 		<param name="mission" type="String" value="$(arg mission)" />
 
 
-	<node name="record" pkg="rosbag" type="record" args="record -a -o $(find trimaran_ros)/rosbag/TestMission" />
+	<node name="record" pkg="rosbag" type="record" args="record -a -o $(find wrsc_plymouth_jegat)/rosbag/TestMission" />
 
 </launch>

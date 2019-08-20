@@ -110,13 +110,13 @@ if __name__ == '__main__':
 	pub_send_gps_origin = rospy.Publisher('launch_send_gps_origin', Vector3, queue_size=10)
 	gps_origin_msg = Vector3()
 	rospy.sleep(1)
-	print(mission_tab[0][1], mission_tab[0][2])
+	rospy.loginfo("[{}] Got gps origin {},{}".format(node_name,mission_tab[0][1], mission_tab[0][2]))
 	gps_origin_msg.x = mission_tab[0][1]
 	gps_origin_msg.y = mission_tab[0][2]
-	rospy.sleep(1)
-	pub_send_gps_origin.publish(gps_origin_msg)
-	rospy.sleep(1)
-	pub_send_gps_origin.publish(gps_origin_msg)
+	rospy.sleep(10)
+	for i in range(5):
+		pub_send_gps_origin.publish(gps_origin_msg)
+		rospy.sleep(0.1)
 
 
 	mission_tab = mission_tab[1:][:]
