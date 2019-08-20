@@ -15,3 +15,5 @@
 		<param name="simu" type="int" value="$(arg simulation)" />
 		<arg name="mission" default="mission.txt" />
 		<param name="mission" type="String" value="$(arg mission)" />
+
+<\launch>
