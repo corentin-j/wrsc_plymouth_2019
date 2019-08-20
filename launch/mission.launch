@@ -6,6 +6,8 @@
 		<param name="simu" type="int" value="$(arg simulation)" />
 		<arg name="mission" default="mission.txt" />
 		<param name="mission" type="String" value="$(arg mission)" />
+		<arg name="m_mode" default="0" />
+		<param name="m_mode" type="int" value="$(arg m_mode)" />
 
 	<node name="simu_boat" pkg="wrsc_plymouth_jegat" type="simu_boat.py" args="--test" respawn="true" output='screen' />
 

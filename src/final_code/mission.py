@@ -71,6 +71,7 @@ if __name__ == '__main__':
 	node_name = 'mission'
 	rospy.init_node(node_name)
 	simu = rospy.get_param('simu',0)
+	m_mode = rospy.get_param('m_mode',0)
 	mission_txt = rospy.get_param('mission',"mission.txt")
 	print(mission_txt)
 	rospy.Subscriber("launch_send_gps_origin", Vector3, sub_gps_origin)
@@ -213,7 +214,7 @@ if __name__ == '__main__':
 			t0 = rospy.get_time()
 			while (rospy.get_time() - t0) < mission[3] and (not rospy.is_shutdown()):
 
-				thetabar,zone,displat = cl.get_thetabar_station_keeping(params,x,zone)
+				thetabar,zone,displat = cl.get_thetabar_station_keeping(params,x,zone,m_mode)
 				u_rudder,u_sail = cl.control(x[2,0],thetabar,psi,2)
 
 				u_rudder_msg.data = u_rudder

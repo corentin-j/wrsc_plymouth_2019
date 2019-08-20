@@ -57,7 +57,7 @@ def control_line_following(x,thetabar,psi):
 #      Station keeping
 ##############################################################################################
 
-def get_thetabar_station_keeping(control_params,x,zone):
+def get_thetabar_station_keeping(control_params,x,zone,mode=0):
 	"""
 	params :
 		x_origin : x coordiante of the origin
@@ -69,6 +69,8 @@ def get_thetabar_station_keeping(control_params,x,zone):
 		x : x coordiante of the boat
 		y : y coordiante of the boat
 		theta : heading of the boat
+	zone : current zone of the state machine
+	mode : 0 -> infinite, 1 -> cross
 	"""
 	x_origin,y_origin,theta_wind,l,r = control_params
 
@@ -93,7 +95,9 @@ def get_thetabar_station_keeping(control_params,x,zone):
 		out_of_zone = np.linalg.det(np.array([[x_ur-x[0,0], x_ur-x_dr],[y_ur-x[1,0],y_ur-y_dr]]))
 		if out_of_zone<0:
 			zone = 2
-			print("[controler] Zone 2")
+			if mode == 1:
+				zone = 3
+			print("[controler] Zone "+str(zone))
 	elif zone == 2:
 		thetabar = circle_following(x_or,y_or,r,-1,x)
 		out_of_zone = np.linalg.det(np.array([[x_dr-x[0,0], x_dr-x_ur],[y_dr-x[1,0],y_dr-y_ur]]))
@@ -105,7 +109,9 @@ def get_thetabar_station_keeping(control_params,x,zone):
 		out_of_zone = -np.linalg.det(np.array([[x_ul-x[0,0], x_ul-x_dl],[y_ul-x[1,0],y_ul-y_dl]]))
 		if out_of_zone<0:
 			zone = 4
-			print("[controler] Zone 4")
+			if mode == 1:
+				zone = 1
+			print("[controler] Zone "+str(zone))
 	elif zone == 4:
 		thetabar = circle_following(x_ol,y_ol,r,1,x)
 		out_of_zone = -np.linalg.det(np.array([[x_dl-x[0,0], x_dl-x_ul],[y_dl-x[1,0],y_dl-y_ul]]))
@@ -121,7 +127,7 @@ def line_following(x_start,y_start,x_end,y_end,x):
 	x = x.flatten()
 	x1, x2, theta = x[0], x[1], x[2]
 
-	ratio = 1
+	ratio = 3
 	a,b = np.array([[x_start],[y_start]]), np.array([[x_end],[y_end]])
 	m = np.array([[x1],[x2]])
 	e = np.linalg.det(np.hstack(((b-a)/np.linalg.norm(b-a), m-a)))
