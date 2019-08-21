@@ -34,7 +34,7 @@ def get_thetabar_line_following(x,q,a,b,psi):
 	e = linalg.det(hstack(((b-a)/linalg.norm(b-a), m-a)))
 	phi = arctan2(b[1,0]-a[1,0], b[0,0]-a[0,0])
 
-	if abs(e) > 10:
+	if abs(e) > 8:
 	    q = sign(e)
 
 	thetabar = phi - arctan(e/r)

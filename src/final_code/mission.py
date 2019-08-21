@@ -208,7 +208,7 @@ if __name__ == '__main__':
 			res = utm.from_latlon(mission[1], mission[2])
 			px = -(lat_lon_origin[1][1]-res[1])
 			py = (lat_lon_origin[1][0]-res[0])
-			params = [px,py,psi,6,2]
+			params = [px,py,psi,4,2]
 			zone = 1
 
 			t0 = rospy.get_time()
